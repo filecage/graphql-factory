@@ -1,0 +1,16 @@
+type Query {
+  "Allows loading the only user we know about"
+  GetUser(
+    "The user's ID"
+    id: Int
+  ): User
+}
+
+type User {
+  id: Int!
+  person: Person!
+}
+
+type Person {
+  name: String!
+}
