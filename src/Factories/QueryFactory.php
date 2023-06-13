@@ -66,6 +66,7 @@ final class QueryFactory implements TypeFactory {
             yield $queryReflection->getShortName() => [
                 'type' => $type,
                 'description' => $query->description,
+                'args' => [...$this->generateArguments($query)],
                 'resolve' => function (mixed $rootValue = null, array $arguments = []) use ($query) {
                     $resolved = $query->resolve($rootValue, $arguments);
                     if (is_callable($resolved)) {
@@ -74,6 +75,15 @@ final class QueryFactory implements TypeFactory {
 
                     return $resolved;
                 }
+            ];
+        }
+    }
+
+    private function generateArguments (Query $query) : Generator {
+        foreach ($query->arguments as $argument) {
+            yield $argument->name => [
+                'type' => $argument->type,
+                'description' => $argument->description,
             ];
         }
     }
