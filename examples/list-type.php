@@ -1,7 +1,7 @@
 <?php
 
-use Filecage\GraphQL\Factory\Attributes\Contains;
-use Filecage\GraphQL\Factory\Enums\ScalarType;
+use Filecage\GraphQL\Annotations\Attributes\Contains;
+use Filecage\GraphQL\Annotations\Enums\ScalarType;
 use Filecage\GraphQL\Factory\Factory;
 use Filecage\GraphQL\Factory\Queries\Query;
 use Filecage\GraphQL\Factory\TypeTransformer\IterableTypeTransformer;

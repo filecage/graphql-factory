@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "php": ">=8.2",
-        "webonyx/graphql-php": "^15.5"
+        "webonyx/graphql-php": "^15.5",
+        "filecage/graphql-annotations": "dev-main"
     },
     "license": "MIT",
     "autoload": {

@@ -2,7 +2,8 @@
 
 namespace Filecage\GraphQL\Factory\Factories;
 
-use Filecage\GraphQL\Factory\Attributes\Contains;
+use Filecage\GraphQL\Annotations\Attributes\Contains;
+use Filecage\GraphQL\Annotations\Enums\ScalarType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
@@ -92,7 +93,17 @@ final class ObjectTypeFactory implements TypeFactory {
             return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $this->factory->forType($contains->type)));
         }
 
-        return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $contains->type->toType()));
+        return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $this->mapScalarTypeToGraphQLType($contains->type)));
+    }
+
+    private function mapScalarTypeToGraphQLType (ScalarType $scalarType) : Type {
+        return match ($scalarType) {
+            ScalarType::ID => Type::id(),
+            ScalarType::INT => Type::int(),
+            ScalarType::FLOAT => Type::float(),
+            ScalarType::STRING => Type::string(),
+            ScalarType::BOOLEAN => Type::boolean(),
+        };
     }
 
     private function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
