@@ -2,6 +2,8 @@
 
 namespace Filecage\GraphQLFactory\Queries;
 
+use Filecage\GraphQLFactory\TypeTransformer\TypeTransformerInterface;
+
 /**
  * @template T
  */
@@ -11,20 +13,23 @@ abstract class Query {
     public readonly array $arguments;
 
     /**
-     * @param class-string<T> $returnTypeClassName
      * @param string $description
+     * @param class-string<T> $returnTypeClassName
+     * @param TypeTransformerInterface|null $transformer
+     * @param Argument ...$arguments
      */
     function __construct (
         public readonly string $description,
         public readonly string $returnTypeClassName,
-        Argument ...$arguments
+        public readonly ?TypeTransformerInterface $transformer = null,
+        Argument ...$arguments,
     ) {
         $this->arguments = $arguments;
     }
 
     /**
-     * @return T|null|(callable(): T|null)
+     * @return T|T[]|null|(callable(): T|T[]|null)
      */
-    abstract function resolve (mixed $rootValue = null, array $arguments = []) : null|object|callable;
+    abstract function resolve (mixed $rootValue = null, array $arguments = []) : null|object|iterable|callable;
 
 }

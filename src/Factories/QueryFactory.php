@@ -58,8 +58,13 @@ final class QueryFactory implements TypeFactory {
                 throw new InvalidTypeException("Failed to create instance for query `{$queryReflection->name}`: {$e->getMessage()}");
             }
 
+            $type = $this->factory->forType($query->returnTypeClassName);
+            if ($query->transformer) {
+                $type = $query->transformer->transform($type);
+            }
+
             yield $queryReflection->getShortName() => [
-                'type' => $this->factory->forType($query->returnTypeClassName),
+                'type' => $type,
                 'description' => $query->description,
                 'resolve' => function (mixed $rootValue = null, array $arguments = []) use ($query) {
                     $resolved = $query->resolve($rootValue, $arguments);
