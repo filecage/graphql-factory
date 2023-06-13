@@ -3,6 +3,7 @@
 namespace Filecage\GraphQL\Factory\Factories;
 
 use Filecage\GraphQL\Annotations\Attributes\Contains;
+use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use Filecage\GraphQL\Annotations\Enums\ScalarType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -38,12 +39,20 @@ final class ObjectTypeFactory implements TypeFactory {
         }
 
         foreach ($this->reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+            if (!empty($property->getAttributes(Ignore::class))) {
+                continue;
+            }
+
             yield $property->name => [
                 'type' => $this->mapType($property->getType(), $property)
             ];
         }
 
         foreach ($this->reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            if (!empty($method->getAttributes(Ignore::class))) {
+                continue;
+            }
+
             if (!str_starts_with(strtolower($method->name), 'get') || strtolower($method->name) === 'get') {
                 continue;
             }
