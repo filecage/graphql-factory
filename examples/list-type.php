@@ -1,5 +1,7 @@
 <?php
 
+use Filecage\GraphQLFactory\Attributes\Contains;
+use Filecage\GraphQLFactory\Enums\ScalarType;
 use Filecage\GraphQLFactory\Factory;
 use Filecage\GraphQLFactory\Queries\Query;
 use Filecage\GraphQLFactory\TypeTransformer\IterableTypeTransformer;
@@ -8,8 +10,20 @@ use GraphQL\Utils\SchemaPrinter;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+class ItemValue {
+    public ?string $value;
+}
+
 class User {
-    function __construct (public readonly string $name) {}
+
+    #[Contains(ItemValue::class, true)]
+    public array $items = [];
+
+    /**
+     * @param string $name
+     * @param array $awards
+     */
+    function __construct (public readonly string $name, #[Contains(ScalarType::STRING)] public readonly ?array $awards) {}
 }
 
 class MyQuery extends Query {
@@ -22,7 +36,7 @@ class MyQuery extends Query {
     }
 
     function resolve (mixed $rootValue = null, array $arguments = []): null|object|iterable|callable {
-        return [new User('Hello'), new User('World')];
+        return [new User('Hello', ['First', 'Second']), new User('World', null)];
     }
 }
 
