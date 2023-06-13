@@ -2,6 +2,7 @@
 
 namespace Filecage\GraphQL\Factory;
 
+use Filecage\GraphQL\Factory\Factories\EnumTypeFactory;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
 use Filecage\GraphQL\Factory\Factories\InternalClassReflection;
@@ -38,11 +39,13 @@ final class Factory {
      */
     function forType (string $className) : Type {
         if (!isset($this->cache[$className])) {
-            $reflectionClass = self::reflect($className);
-            if ($reflectionClass->isInternal()) {
-                $factory = new InternalClassReflection($reflectionClass);
+            $reflection = self::reflect($className);
+            if ($reflection instanceof \ReflectionEnum) {
+                $factory = new EnumTypeFactory($reflection);
+            } elseif ($reflection->isInternal()) {
+                $factory = new InternalClassReflection($reflection);
             } else {
-                $factory = new ObjectTypeFactory($this, $reflectionClass);
+                $factory = new ObjectTypeFactory($this, $reflection);
             }
 
             $this->cache[$className] = $factory->create();
@@ -56,7 +59,14 @@ final class Factory {
      */
     private function reflect (string $className) : \ReflectionClass {
         try {
-            return new \ReflectionClass($className);
+            $reflection = new \ReflectionClass($className);
+
+            // Convert to special types if that's what this is
+            if ($reflection->isEnum()) {
+                return new \ReflectionEnum($className);
+            }
+
+            return $reflection;
         } catch (\ReflectionException $e) {
             throw new InvalidTypeException("Could not reflect class `{$className}`: {$e->getMessage()}");
         }
