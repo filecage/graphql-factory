@@ -1,0 +1,21 @@
+{
+    "name": "filecage/graphql-factory",
+    "description": "Create webonyx compatible graphql schema definitions using Reflection API",
+    "type": "library",
+    "require": {
+        "php": ">=8.2",
+        "webonyx/graphql-php": "^15.5"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Filecage\\GraphQLFactory\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "David",
+            "email": "filecage@users.noreply.github.com"
+        }
+    ]
+}
