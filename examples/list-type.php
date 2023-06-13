@@ -1,10 +1,10 @@
 <?php
 
-use Filecage\GraphQLFactory\Attributes\Contains;
-use Filecage\GraphQLFactory\Enums\ScalarType;
-use Filecage\GraphQLFactory\Factory;
-use Filecage\GraphQLFactory\Queries\Query;
-use Filecage\GraphQLFactory\TypeTransformer\IterableTypeTransformer;
+use Filecage\GraphQL\Factory\Attributes\Contains;
+use Filecage\GraphQL\Factory\Enums\ScalarType;
+use Filecage\GraphQL\Factory\Factory;
+use Filecage\GraphQL\Factory\Queries\Query;
+use Filecage\GraphQL\Factory\TypeTransformer\IterableTypeTransformer;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
 

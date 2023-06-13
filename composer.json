@@ -9,7 +9,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Filecage\\GraphQLFactory\\": "src/"
+            "Filecage\\GraphQL\\Factory\\": "src/"
         }
     },
     "authors": [

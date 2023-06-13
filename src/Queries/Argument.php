@@ -1,6 +1,6 @@
 <?php
 
-namespace Filecage\GraphQLFactory\Queries;
+namespace Filecage\GraphQL\Factory\Queries;
 
 use GraphQL\Type\Definition\Type;
 

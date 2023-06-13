@@ -1,6 +1,6 @@
 <?php
 
-namespace Filecage\GraphQLFactory\Enums;
+namespace Filecage\GraphQL\Factory\Enums;
 
 use GraphQL\Type\Definition\Type;
 

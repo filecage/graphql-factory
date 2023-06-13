@@ -1,12 +1,12 @@
 <?php
 
-namespace Filecage\GraphQLFactory\Factories;
+namespace Filecage\GraphQL\Factory\Factories;
 
-use Filecage\GraphQLFactory\Attributes\Contains;
+use Filecage\GraphQL\Factory\Attributes\Contains;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use Filecage\GraphQLFactory\Exceptions\InvalidTypeException;
-use Filecage\GraphQLFactory\Factory;
+use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
+use Filecage\GraphQL\Factory\Factory;
 
 /**
  * @internal

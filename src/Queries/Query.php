@@ -1,8 +1,8 @@
 <?php
 
-namespace Filecage\GraphQLFactory\Queries;
+namespace Filecage\GraphQL\Factory\Queries;
 
-use Filecage\GraphQLFactory\TypeTransformer\TypeTransformerInterface;
+use Filecage\GraphQL\Factory\TypeTransformer\TypeTransformerInterface;
 
 /**
  * @template T

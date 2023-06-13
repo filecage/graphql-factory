@@ -1,8 +1,8 @@
 <?php
 
-namespace Filecage\GraphQLFactory\Attributes;
+namespace Filecage\GraphQL\Factory\Attributes;
 
-use Filecage\GraphQLFactory\Enums\ScalarType;
+use Filecage\GraphQL\Factory\Enums\ScalarType;
 
 #[\Attribute]
 final class Contains {

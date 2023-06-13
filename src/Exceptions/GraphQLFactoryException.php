@@ -1,5 +1,5 @@
 <?php
 
-namespace Filecage\GraphQLFactory\Exceptions;
+namespace Filecage\GraphQL\Factory\Exceptions;
 
 class GraphQLFactoryException extends \Exception {}

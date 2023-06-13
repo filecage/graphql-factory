@@ -1,12 +1,12 @@
 <?php
 
-namespace Filecage\GraphQLFactory;
+namespace Filecage\GraphQL\Factory;
 
 use GraphQL\Type\Definition\Type;
-use Filecage\GraphQLFactory\Exceptions\InvalidTypeException;
-use Filecage\GraphQLFactory\Factories\InternalClassReflection;
-use Filecage\GraphQLFactory\Factories\ObjectTypeFactory;
-use Filecage\GraphQLFactory\Factories\QueryFactory;
+use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
+use Filecage\GraphQL\Factory\Factories\InternalClassReflection;
+use Filecage\GraphQL\Factory\Factories\ObjectTypeFactory;
+use Filecage\GraphQL\Factory\Factories\QueryFactory;
 
 final class Factory {
 

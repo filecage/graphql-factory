@@ -8,7 +8,7 @@ It does so by recursively mapping the object's public properties to a scalar typ
 ### Initializing
 The factory requires a dependency resolver when resolving queries; see "Resolving with dependencies" for more details on that.
 ```php
-$graphQLFactory = new \Filecage\GraphQLFactory\Factory($dependencyResolver)
+$graphQLFactory = new \Filecage\GraphQL\Factory\Factory($dependencyResolver)
 ```
 
 ### Mapping a data model
@@ -39,7 +39,7 @@ They also have to implement a resolver method that takes the same arguments as a
 
 Let's build a query to get our user models based on the ID:
 ```php
-class GetUser extends \Filecage\GraphQLFactory\Queries\Query {
+class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     private const USERS = [
         1 => 'David',
         2 => 'Also David, but better' 
@@ -49,7 +49,7 @@ class GetUser extends \Filecage\GraphQLFactory\Queries\Query {
         parent::__construct(
             description: 'Allows loading the only user we know about',
             returnTypeClassName: User::class,
-            arguments: new \Filecage\GraphQLFactory\Queries\Argument(
+            arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
                 name: 'id',
                 description: "The user's ID",
                 type: \GraphQL\Type\Definition\Type::int()  
@@ -105,16 +105,16 @@ How dependencies are resolved is totally up to the user implementation.
 An example setup using [Creator](https://github.com/filecage/creator), a modern reflection-based auto-wiring dependency resolver, could look like this:
 ```php
 $creator = new \Creator\Creator();
-$graphQLFactory = new \Filecage\GraphQLFactory\Factory(fn (callable $resolved) => $creator->invoke($resolved));
+$graphQLFactory = new \Filecage\GraphQL\Factory\Factory(fn (callable $resolved) => $creator->invoke($resolved));
 ```
 Having set up a dependency resolver like Creator, our query example could now look like this:
 ```php
-class GetUser extends \Filecage\GraphQLFactory\Queries\Query {
+class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     function __construct() {
         parent::__construct(
             description: 'Allows loading users from our UserLoader',
             returnTypeClassName: User::class,
-            arguments: new \Filecage\GraphQLFactory\Queries\Argument(
+            arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
                 name: 'id',
                 description: "The user's ID",
                 type: \GraphQL\Type\Definition\Type::int()  

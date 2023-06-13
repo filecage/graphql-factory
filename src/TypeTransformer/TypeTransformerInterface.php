@@ -1,6 +1,6 @@
 <?php
 
-namespace Filecage\GraphQLFactory\TypeTransformer;
+namespace Filecage\GraphQL\Factory\TypeTransformer;
 
 use GraphQL\Type\Definition\Type;
 
