@@ -2,6 +2,7 @@
 
 namespace Filecage\GraphQLFactory\Factories;
 
+use Filecage\GraphQLFactory\Attributes\Contains;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQLFactory\Exceptions\InvalidTypeException;
@@ -37,7 +38,7 @@ final class ObjectTypeFactory implements TypeFactory {
 
         foreach ($this->reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             yield $property->name => [
-                'type' => $this->mapType($property->getType(), "property `{$property->class}::\${$property->name}`")
+                'type' => $this->mapType($property->getType(), $property)
             ];
         }
 
@@ -47,35 +48,63 @@ final class ObjectTypeFactory implements TypeFactory {
             }
 
             yield lcfirst(substr($method->name, 3)) => [
-                'type' => $this->mapType($method->getReturnType(), "method `{$method->class}::{$method->name}()`")
+                'type' => $this->mapType($method->getReturnType(), $method)
             ];
-
         }
     }
 
     /**
      * @throws InvalidTypeException
      */
-    private function mapType (?\ReflectionType $type, string $exceptionContext) : Type {
+    private function mapType (?\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : Type {
         if (!$type instanceof \ReflectionNamedType) {
-            throw new InvalidTypeException("Missing or invalid return type for $exceptionContext");
+            throw new InvalidTypeException("Missing or invalid return type for {$this->formatExceptionContext($context)}");
         }
 
+
         if ($type->isBuiltin()) {
-            return $this->finalizeReflectionType($type, match($type->getName()) {
+            return $this->wrapAllowsNull($type->allowsNull(), match($type->getName()) {
                 'string' => Type::string(),
                 'float' => Type::float(),
                 'int' => Type::int(),
                 'bool' => Type::boolean(),
-                default => throw new InvalidTypeException("Unsupported builtin type `{$type->getName()}` for $exceptionContext"),
+                'array' => $this->mapTypeForArray($type, $context),
+                default => throw new InvalidTypeException("Unsupported builtin type `{$type->getName()}` for {$this->formatExceptionContext($context)}"),
             });
         }
 
-        return $this->finalizeReflectionType($type, $this->factory->forType($type->getName()));
+        return $this->wrapAllowsNull($type->allowsNull(), $this->factory->forType($type->getName()));
     }
 
-    private function finalizeReflectionType (\ReflectionType $reflectionType, Type $type) : Type {
-        return $reflectionType->allowsNull() ? $type : Type::nonNull($type);
+    /**
+     * @throws InvalidTypeException
+     */
+    private function mapTypeForArray (\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : Type {
+        $contains = $context->getAttributes(Contains::class);
+        if (count($contains) !== 1) {
+            throw new InvalidTypeException("Type clarification for array type is missing or too ambiguous (expected exactly 1 `Contains` attribute) for {$this->formatExceptionContext($context)}");
+        }
+
+        /** @var Contains $contains */
+        $contains = $contains[0]->newInstance();
+
+        if (is_string($contains->type)) {
+            return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $this->factory->forType($contains->type)));
+        }
+
+        return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $contains->type->toType()));
+    }
+
+    private function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
+        return $allowsNull ? $type : Type::nonNull($type);
+    }
+
+    private function formatExceptionContext (\ReflectionMethod|\ReflectionProperty $context) : string {
+        if ($context instanceof \ReflectionMethod) {
+            return "return type of `{$context->class}::{$context->name}()`";
+        }
+
+        return "property `{$context->class}::\${$context->name}`";
     }
 
 }
