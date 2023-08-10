@@ -9,8 +9,17 @@ type Query {
 type User {
   id: Int!
   person: Person!
+  type: UserType!
 }
 
 type Person {
   name: String!
+}
+
+enum UserType {
+  "A normal user without any special rights"
+  NormalUser
+
+  "An admin user with the right to rule the world"
+  Admin
 }

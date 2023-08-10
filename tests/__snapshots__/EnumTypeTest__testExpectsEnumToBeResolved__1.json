@@ -1,0 +1,10 @@
+{
+    "data": {
+        "normalUser": {
+            "type": "NormalUser"
+        },
+        "adminUser": {
+            "type": "Admin"
+        }
+    }
+}
