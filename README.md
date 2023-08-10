@@ -2,7 +2,8 @@
 > ⚠️ This is a work in progress that might never reach a 1.x release
 
 This library converts arbitrary data model classes into types that can be used with [webonyx/graphql-php](https://github.com/webonyx/graphql-php) using PHP's Reflection API.
-It does so by recursively mapping the object's public properties to a scalar type provided by GraphQL. It does **not** overwrite the default resolver from the library.
+It does so by recursively mapping the object's public properties to a scalar type provided by GraphQL. It overwrites webonyx' default resolver where necessary
+(see [Resolving Data Fields](#resolving-getter-methods)).
 
 ## Usage
 ### Initializing
@@ -127,3 +128,7 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     }
 }
 ```
+
+### Resolving Getter Methods
+Public getter methods (methods starting with `get`) from your model will be included in the schema. For this purpose a custom
+resolver function is added to the schema that then calls the method.

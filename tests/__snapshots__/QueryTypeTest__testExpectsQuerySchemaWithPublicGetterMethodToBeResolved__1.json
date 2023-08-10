@@ -1,0 +1,10 @@
+{
+    "data": {
+        "GetUser": {
+            "person": {
+                "name": "David",
+                "nameHashed": "a6b54c20a7b96eeac1a911e6da3124a560fe6dc042ebf270e3676e7095b95652"
+            }
+        }
+    }
+}

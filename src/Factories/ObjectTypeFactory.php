@@ -58,7 +58,8 @@ final class ObjectTypeFactory implements TypeFactory {
             }
 
             yield lcfirst(substr($method->name, 3)) => [
-                'type' => $this->mapType($method->getReturnType(), $method)
+                'type' => $this->mapType($method->getReturnType(), $method),
+                'resolve' => fn ($rootValue, array $args) => call_user_func([$rootValue, $method->name, ...$args]),
             ];
         }
     }
