@@ -4,7 +4,7 @@ namespace Filecage\GraphQL\Factory\Queries;
 
 use GraphQL\Type\Definition\Type;
 
-final class Argument {
+class Argument {
 
     function __construct (
         public readonly string $description,
