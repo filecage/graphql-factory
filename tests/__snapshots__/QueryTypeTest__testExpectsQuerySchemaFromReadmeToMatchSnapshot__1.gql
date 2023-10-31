@@ -7,13 +7,17 @@ type Query {
 }
 
 type User {
+  "The user ID of this entity"
   id: Int!
+
   person: Person!
   type: UserType!
 }
 
 type Person {
   name: String!
+
+  "SHA256 hash of the Persons's name"
   nameHashed: String!
 }
 

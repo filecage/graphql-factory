@@ -5,6 +5,7 @@ namespace Filecage\GraphQL\Factory\Factories;
 use Filecage\GraphQL\Annotations\Attributes\Contains;
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use Filecage\GraphQL\Annotations\Enums\ScalarType;
+use GraphQL\Type\Definition\Description;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
@@ -43,8 +44,11 @@ final class ObjectTypeFactory implements TypeFactory {
                 continue;
             }
 
+
+
             yield $property->name => [
-                'type' => $this->mapType($property->getType(), $property)
+                'type' => $this->mapType($property->getType(), $property),
+                'description' => $this->findDescription($property),
             ];
         }
 
@@ -59,6 +63,7 @@ final class ObjectTypeFactory implements TypeFactory {
 
             yield lcfirst(substr($method->name, 3)) => [
                 'type' => $this->mapType($method->getReturnType(), $method),
+                'description' => $this->findDescription($method),
                 'resolve' => fn ($rootValue, array $args) => call_user_func([$rootValue, $method->name, ...$args]),
             ];
         }
@@ -118,6 +123,18 @@ final class ObjectTypeFactory implements TypeFactory {
 
     private function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
         return $allowsNull ? $type : Type::nonNull($type);
+    }
+
+    private function findDescription (\ReflectionMethod|\ReflectionProperty $descriptionAware) : ?string {
+        $descriptions = $descriptionAware->getAttributes(Description::class);
+        if (empty($descriptions)) {
+            return null;
+        }
+
+        /** @var Description $description */
+        $description = $descriptions[0]->newInstance();
+
+        return $description->description;
     }
 
     private function formatExceptionContext (\ReflectionMethod|\ReflectionProperty $context) : string {
