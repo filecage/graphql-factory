@@ -131,4 +131,28 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
 
 ### Resolving Getter Methods
 Public getter methods (methods starting with `get`) from your model will be included in the schema. For this purpose a custom
-resolver function is added to the schema that then calls the method.
+
+Argument Fixtures can implement a resolve function very similar to a query's resolver.
+This in-between resolver allows resolving an argument to one or many additional arguments that will be passed
+to the consuming query.
+
+```php
+class UserIdArgument implements \Filecage\GraphQL\Factory\Interfaces\Argument\Resolvable {
+    function __construct() {
+        parent::__construct(
+            'userId', 
+            "The user's ID",
+            \GraphQL\Type\Definition\Type::int()
+        )
+    }
+    
+    function resolve(mixed $rootValue = null, array $arguments = []) : callable {
+        return function (UserLoader $userLoader) : \Generator {
+            yield 'user' => $userLoader->loadUserById($arguments['id']);
+        }
+    }
+}
+```
+
+This will add a `user` argument to the `arguments` array, accessible for all subsequent consumers (including argument resolvers).
+

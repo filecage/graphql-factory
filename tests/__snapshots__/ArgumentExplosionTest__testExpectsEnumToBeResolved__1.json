@@ -1,0 +1,10 @@
+{
+    "data": {
+        "normalPerson": {
+            "name": "David"
+        },
+        "adminPerson": {
+            "name": "Also David, but better"
+        }
+    }
+}
