@@ -131,7 +131,37 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
 
 ### Resolving Getter Methods
 Public getter methods (methods starting with `get`) from your model will be included in the schema. For this purpose a custom
+resolver function is added to the schema that then calls the method.
 
+### Argument Fixtures
+Some arguments might be used multiple times within your project, so it might make sense to share these arguments
+within different queries. This can easily be done by defining a class with pre-defined argument values:
+
+```php
+class UserIdArgument {
+    function __construct() {
+        parent::__construct(
+            'userId', 
+            "The user's ID",
+            \GraphQL\Type\Definition\Type::int()
+        )
+    }
+}
+```
+I call this pattern 'argument fixture'. Use your Argument Fixture in any given query then:
+```php
+class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
+    function __construct() {
+        parent::__construct(
+            description: 'Allows loading users from our UserLoader',
+            returnTypeClassName: User::class,
+            arguments: new UserIdArgument()
+        )
+    }
+}
+```
+
+### Argument Explosion
 Argument Fixtures can implement a resolve function very similar to a query's resolver.
 This in-between resolver allows resolving an argument to one or many additional arguments that will be passed
 to the consuming query.
