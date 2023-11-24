@@ -3,6 +3,7 @@
 namespace Filecage\GraphQL\FactoryTests;
 
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetDateTime;
+use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetDifferentTimes;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUser;
 use Filecage\GraphQL\FactoryTests\Util\FactoryProvider;
 use Filecage\GraphQL\FactoryTests\Util\MatchesGQLSnapshot;
@@ -27,8 +28,13 @@ class QueryTypeTest extends TestCase {
         $this->assertMatchesQuerySnapshot($result);
     }
 
+    function testExpectsQuerySchemaWithDateTimeInterfaceToMatchSnapshot () {
+        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetDateTime::class, GetDifferentTimes::class)]);
+        $this->assertMatchesGraphQLSchemaSnapshot($schema);
+    }
+
     function testExpectsQuerySchemaWithDateTimeInterfaceValue () {
-        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetDateTime::class)]);
+        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetDateTime::class, GetDifferentTimes::class)]);
         $result = GraphQL::executeQuery($schema, '{GetDateTime { iso8601, ymd, hms, tz } }');
 
         $this->assertMatchesQuerySnapshot($result);

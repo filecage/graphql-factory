@@ -16,7 +16,7 @@ trait MatchesGQLSnapshot {
 
     function assertMatchesQuerySnapshot (ExecutionResult $executionResult) : void {
         if (!empty($executionResult->errors)) {
-            throw new $executionResult->errors[0];
+            throw new \Exception($executionResult->errors[0]->getMessage());
         }
 
         $this->assertMatchesSnapshot($executionResult, new JsonDriver());

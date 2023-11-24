@@ -2,7 +2,8 @@
 
 namespace Filecage\GraphQL\Factory\Factories;
 
-use Filecage\GraphQL\Factory\Types\DateTimeInterfaceType;
+use Filecage\GraphQL\Factory\Interfaces\Types\Cacheable;
+use Filecage\GraphQL\Factory\Types\DateTimeType;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
 
@@ -16,9 +17,9 @@ final class InternalClassReflection implements TypeFactory {
     /**
      * @throws InvalidTypeException
      */
-    function create () : Type {
+    function create () : Type&Cacheable {
         if ($this->reflectionClass->implementsInterface(\DateTimeInterface::class)) {
-            return new DateTimeInterfaceType();
+            return new DateTimeType();
         }
 
         return match ($this->reflectionClass->name) {

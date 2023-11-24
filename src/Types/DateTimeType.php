@@ -3,13 +3,15 @@
 namespace Filecage\GraphQL\Factory\Types;
 
 use DateTimeInterface;
+use Filecage\GraphQL\Factory\Interfaces\Types\Cacheable;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-final class DateTimeInterfaceType extends ObjectType {
+final class DateTimeType extends ObjectType implements Cacheable {
     function __construct () {
         parent::__construct([
             'name' => 'DateTime',
+            'description' => 'DateTime in ISO8601 representation (YYYY-MM-DDTHH:MM:SSZ)',
             'fields' => [
                 'iso8601' => [
                     'type' => Type::string(),
@@ -33,5 +35,9 @@ final class DateTimeInterfaceType extends ObjectType {
                 ]
             ],
         ]);
+    }
+
+    function getCacheTypeName (): string {
+        return DateTimeInterface::class;
     }
 }
