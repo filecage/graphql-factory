@@ -133,6 +133,12 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
 Public getter methods (methods starting with `get`) from your model will be included in the schema. For this purpose a custom
 resolver function is added to the schema that then calls the method.
 
+### Resolving Internal Types
+Some internal types will be mapped, so they won't break your existing interface. A good example is `DateTimeInterface`, that
+will be mapped to an object with different properties to access the DateTime values.
+
+To see what type maps exists and how they resolve, see [Types](src/Types).
+
 ### Argument Fixtures
 Some arguments might be used multiple times within your project, so it might make sense to share these arguments
 within different queries. This can easily be done by defining a class with pre-defined argument values:
@@ -185,4 +191,3 @@ class UserIdArgument implements \Filecage\GraphQL\Factory\Interfaces\Argument\Re
 ```
 
 This will add a `user` argument to the `arguments` array, accessible for all subsequent consumers (including argument resolvers).
-
