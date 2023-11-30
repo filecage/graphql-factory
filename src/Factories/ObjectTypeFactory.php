@@ -10,6 +10,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
 use Filecage\GraphQL\Factory\Factory;
+use SensitiveParameter;
 
 /**
  * @internal
@@ -40,11 +41,9 @@ final class ObjectTypeFactory implements TypeFactory {
         }
 
         foreach ($this->reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-            if (!empty($property->getAttributes(Ignore::class))) {
+            if ($this->hasSkipAttributes($property)) {
                 continue;
             }
-
-
 
             yield $property->name => [
                 'type' => $this->mapType($property->getType(), $property),
@@ -53,7 +52,7 @@ final class ObjectTypeFactory implements TypeFactory {
         }
 
         foreach ($this->reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            if (!empty($method->getAttributes(Ignore::class))) {
+            if ($this->hasSkipAttributes($method)) {
                 continue;
             }
 
@@ -123,6 +122,25 @@ final class ObjectTypeFactory implements TypeFactory {
 
     private function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
         return $allowsNull ? $type : Type::nonNull($type);
+    }
+
+    private function hasSkipAttributes (\ReflectionMethod|\ReflectionProperty $attributeAware) : bool {
+        $skipProperties = [
+            ...$attributeAware->getAttributes(Ignore::class),
+        ];
+
+        // For promoted attributes we'll have to take a look at the declaring parameter, too
+        if ($attributeAware instanceof \ReflectionProperty && $attributeAware->isPromoted()) {
+            /** @var \ReflectionParameter $propertyDeclaringParameter */
+            $propertyDeclaringParameters = array_filter($attributeAware->getDeclaringClass()->getConstructor()->getParameters(), fn(\ReflectionParameter $parameter) => $parameter->name === $attributeAware->name);
+            $propertyDeclaringParameter = array_pop($propertyDeclaringParameters);
+
+            $skipProperties = array_merge($skipProperties, [
+                ...$propertyDeclaringParameter->getAttributes(SensitiveParameter::class),
+            ]);
+        }
+
+        return !empty($skipProperties);
     }
 
     private function findDescription (\ReflectionMethod|\ReflectionProperty $descriptionAware) : ?string {

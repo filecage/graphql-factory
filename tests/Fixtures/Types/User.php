@@ -4,6 +4,7 @@ namespace Filecage\GraphQL\FactoryTests\Fixtures\Types;
 
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use GraphQL\Type\Definition\Description;
+use SensitiveParameter;
 
 class User {
     function __construct (
@@ -14,5 +15,8 @@ class User {
 
         #[Ignore]
         public readonly string $passwordAlgo = '',
+
+        #[SensitiveParameter]
+        public readonly string $password = '',
     ) {}
 }

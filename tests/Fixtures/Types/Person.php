@@ -4,6 +4,7 @@ namespace Filecage\GraphQL\FactoryTests\Fixtures\Types;
 
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use GraphQL\Type\Definition\Description;
+use SensitiveParameter;
 
 class Person {
     function __construct (
