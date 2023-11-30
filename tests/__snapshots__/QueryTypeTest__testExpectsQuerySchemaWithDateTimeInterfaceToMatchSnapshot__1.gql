@@ -1,0 +1,27 @@
+type Query {
+  "Returns the date time of 2023-11-24 12:34:56 in UTC"
+  GetDateTime: DateTime
+
+  "Returns two different times"
+  GetDifferentTimes: TwoDifferentTimes
+}
+
+"DateTime in ISO8601 representation (YYYY-MM-DDTHH:MM:SSZ)"
+type DateTime {
+  "DateTime as ISO8601 string"
+  iso8601: String!
+
+  "Date only in the format of YYYY-MM-DD (e.g. 2023-08-22), all leading zeros"
+  ymd: String!
+
+  "Time only in the format of H:M:S (e.g. 21:42:04)"
+  hms: String!
+
+  "Timezone only as identifier representation"
+  tz: String!
+}
+
+type TwoDifferentTimes {
+  one: DateTime
+  two: DateTime
+}
