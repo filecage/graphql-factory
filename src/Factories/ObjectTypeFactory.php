@@ -52,7 +52,7 @@ final class ObjectTypeFactory implements TypeFactory {
         }
 
         foreach ($this->reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($this->hasSkipAttributes($method)) {
+            if ($this->hasSkipAttributes($method) || $method->isInternal()) {
                 continue;
             }
 
