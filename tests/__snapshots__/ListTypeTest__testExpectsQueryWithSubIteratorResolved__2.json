@@ -1,0 +1,29 @@
+{
+    "data": {
+        "GetPetOwners": [
+            {
+                "person": {
+                    "name": "David"
+                },
+                "pets": [
+                    {
+                        "name": "Lenny"
+                    },
+                    {
+                        "name": "Nox"
+                    }
+                ]
+            },
+            {
+                "person": {
+                    "name": "Julia"
+                },
+                "pets": [
+                    {
+                        "name": "Nox"
+                    }
+                ]
+            }
+        ]
+    }
+}

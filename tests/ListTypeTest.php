@@ -2,6 +2,7 @@
 
 namespace Filecage\GraphQL\FactoryTests;
 
+use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetPetOwners;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUsersUsingArray;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUsersUsingIterators;
 use Filecage\GraphQL\FactoryTests\Util\FactoryProvider;
@@ -24,6 +25,14 @@ class ListTypeTest extends TestCase {
     function testExpectsQueryWithListResolvedUsingIterators () {
         $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetUsersUsingIterators::class)]);
         $result = GraphQL::executeQuery($schema, '{GetUsersUsingIterators { id, type }}');
+
+        $this->assertMatchesGraphQLSchemaSnapshot($schema);
+        $this->assertMatchesQuerySnapshot($result);
+    }
+
+    function testExpectsQueryWithSubIteratorResolved () {
+        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetPetOwners::class)]);
+        $result = GraphQL::executeQuery($schema, '{GetPetOwners { person { name } pets { name } }}');
 
         $this->assertMatchesGraphQLSchemaSnapshot($schema);
         $this->assertMatchesQuerySnapshot($result);

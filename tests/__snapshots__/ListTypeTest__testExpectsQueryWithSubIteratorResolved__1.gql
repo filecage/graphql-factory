@@ -1,0 +1,20 @@
+type Query {
+  "Generates a list with wrapped sub-lists using an ArrayIterator instance"
+  GetPetOwners: [PetOwner]
+}
+
+type PetOwner {
+  person: Person!
+  pets: [Pet!]!
+}
+
+type Person {
+  name: String!
+
+  "SHA256 hash of the Persons's name"
+  nameHashed: String!
+}
+
+type Pet {
+  name: String!
+}

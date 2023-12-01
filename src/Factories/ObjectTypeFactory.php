@@ -15,7 +15,7 @@ use SensitiveParameter;
 /**
  * @internal
  */
-final class ObjectTypeFactory implements TypeFactory {
+class ObjectTypeFactory implements TypeFactory {
 
     /**
      * @internal
@@ -94,15 +94,16 @@ final class ObjectTypeFactory implements TypeFactory {
     /**
      * @throws InvalidTypeException
      */
-    private function mapTypeForArray (\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : Type {
+    protected function mapTypeForArray (\ReflectionType $type, \ReflectionMethod|\ReflectionProperty|\ReflectionClass $context) : Type {
         $contains = $context->getAttributes(Contains::class);
         if (count($contains) !== 1) {
             throw new InvalidTypeException("Type clarification for array type is missing or too ambiguous (expected exactly 1 `Contains` attribute) for {$this->formatExceptionContext($context)}");
         }
 
-        /** @var Contains $contains */
-        $contains = $contains[0]->newInstance();
+        return $this->mapTypeForContains($contains[0]->newInstance());
+    }
 
+    protected function mapTypeForContains (Contains $contains) : Type {
         if (is_string($contains->type)) {
             return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $this->factory->forType($contains->type)));
         }
@@ -120,7 +121,7 @@ final class ObjectTypeFactory implements TypeFactory {
         };
     }
 
-    private function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
+    protected function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
         return $allowsNull ? $type : Type::nonNull($type);
     }
 
