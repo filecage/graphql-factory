@@ -1,0 +1,14 @@
+{
+    "data": {
+        "GetUsersUsingArray": [
+            {
+                "id": 1,
+                "type": "NormalUser"
+            },
+            {
+                "id": 2,
+                "type": "Admin"
+            }
+        ]
+    }
+}
