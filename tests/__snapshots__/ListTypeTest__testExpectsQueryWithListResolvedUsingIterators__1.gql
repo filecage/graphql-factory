@@ -16,6 +16,8 @@ type Person {
 
   "SHA256 hash of the Persons's name"
   nameHashed: String!
+
+  isCelebrity: Boolean!
 }
 
 enum UserType {

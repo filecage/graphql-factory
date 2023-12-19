@@ -3,6 +3,7 @@
 namespace Filecage\GraphQL\FactoryTests\Fixtures\Types;
 
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
+use Filecage\GraphQL\Annotations\Attributes\Promote;
 use GraphQL\Type\Definition\Description;
 use SensitiveParameter;
 
@@ -18,6 +19,15 @@ class Person {
 
     #[Ignore]
     function getIgnoredValue () : bool {
+        return true;
+    }
+
+    #[Promote]
+    function isCelebrity () : bool {
+        return false;
+    }
+
+    function isSecret () : bool {
         return true;
     }
 

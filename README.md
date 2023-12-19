@@ -131,7 +131,24 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
 
 ### Resolving Getter Methods
 Public getter methods (methods starting with `get`) from your model will be included in the schema. For this purpose a custom
-resolver function is added to the schema that then calls the method.
+resolver function is added to the schema that then calls the method. This can be surpress using the `#[Filecage\GraphQL\Annotations\Ignore]` annotation.
+
+Additionally, the `#[Filecage\GraphQL\Annotations\Promote]` attribute does the opposite and promotes a non-exported method to the schema
+that would otherwise be missing.
+
+```php
+class Person {
+    function getName() {} // This will be part of the schema automatically because the method's name starts with 'get'
+    
+    #[\Filecage\GraphQL\Annotations\Attributes\Ignore]
+    function getNameSecret() {} // This won't be part of the schema automatically because it has the `Ignore` attribute
+    
+    function isSecret() {} // This won't be part of the schema automatically because the method's name does not start with `get`
+    
+    #[\Filecage\GraphQL\Annotations\Attributes\Promote]
+    function isCelebrity() {} // This will be part of the schema because it has the `Promote` attribute
+}
+```
 
 ### Resolving Internal Types
 Some internal types will be mapped, so they won't break your existing interface. A good example is `DateTimeInterface`, that

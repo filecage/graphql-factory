@@ -13,6 +13,8 @@ type Person {
 
   "SHA256 hash of the Persons's name"
   nameHashed: String!
+
+  isCelebrity: Boolean!
 }
 
 type Pet {

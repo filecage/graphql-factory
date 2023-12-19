@@ -4,6 +4,7 @@ namespace Filecage\GraphQL\Factory\Factories;
 
 use Filecage\GraphQL\Annotations\Attributes\Contains;
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
+use Filecage\GraphQL\Annotations\Attributes\Promote;
 use Filecage\GraphQL\Annotations\Enums\ScalarType;
 use GraphQL\Type\Definition\Description;
 use GraphQL\Type\Definition\ObjectType;
@@ -56,11 +57,20 @@ class ObjectTypeFactory implements TypeFactory {
                 continue;
             }
 
-            if (!str_starts_with(strtolower($method->name), 'get') || strtolower($method->name) === 'get') {
+            if ((!str_starts_with(strtolower($method->name), 'get') || strtolower($method->name) === 'get') && empty($promoteAttributes = $method->getAttributes(Promote::class))) {
                 continue;
             }
 
-            yield lcfirst(substr($method->name, 3)) => [
+            if (!empty($promoteAttributes)) {
+                /** @var Promote $promoteAttribute */
+                $promoteAttribute = $promoteAttributes[0]->newInstance();
+                $name = $promoteAttribute->name ?? $method->getName();
+            } else {
+                // Just remove the `get` from the string
+                $name = lcfirst(substr($method->name, 3));
+            }
+
+            yield $name => [
                 'type' => $this->mapType($method->getReturnType(), $method),
                 'description' => $this->findDescription($method),
                 'resolve' => fn ($rootValue, array $args) => call_user_func([$rootValue, $method->name, ...$args]),
