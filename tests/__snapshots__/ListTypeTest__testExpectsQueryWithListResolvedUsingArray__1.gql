@@ -1,6 +1,9 @@
 type Query {
   "Allows listing all users and uses an array internally"
-  GetUsersUsingArray: [User]
+  GetUsersUsingArray: [User!]
+
+  "Allows listing all users and uses an array internally"
+  GetUsersUsingArrayAndAllowNullValues: [User]
 }
 
 type User {

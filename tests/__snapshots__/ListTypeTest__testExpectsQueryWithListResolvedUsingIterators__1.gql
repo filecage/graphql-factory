@@ -1,6 +1,6 @@
 type Query {
   "Allows listing all users and uses an iterator internally"
-  GetUsersUsingIterators: [User]
+  GetUsersUsingIterators: [User!]
 }
 
 type User {

@@ -1,6 +1,6 @@
 type Query {
   "Generates a list with wrapped sub-lists using an ArrayIterator instance"
-  GetPetOwners: [PetOwner]
+  GetPetOwners: [PetOwner!]
 }
 
 type PetOwner {

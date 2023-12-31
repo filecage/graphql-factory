@@ -23,11 +23,11 @@ class GetUsersUsingArray extends Query {
         return array_map(fn(array $user, int $id) => new User($id, new Person($user['name']), $user['type']), self::USERS, array_keys(self::USERS));
     }
 
-    function __construct() {
+    function __construct(bool $allowNullValues = false) {
         parent::__construct(
             description: 'Allows listing all users and uses an array internally',
             returnTypeClassName: User::class,
-            transformer: new IterableTypeTransformer()
+            transformer: new IterableTypeTransformer($allowNullValues)
         );
     }
 
