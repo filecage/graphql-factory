@@ -8,7 +8,7 @@ final class InvalidIdentifierType {
 
     function __construct (
         #[Identifier]
-        public CarIdentifier $identifier
+        public \stdClass $identifier
     ) {}
 
 }
