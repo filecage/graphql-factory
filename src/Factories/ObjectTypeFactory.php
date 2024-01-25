@@ -3,6 +3,7 @@
 namespace Filecage\GraphQL\Factory\Factories;
 
 use Filecage\GraphQL\Annotations\Attributes\Contains;
+use Filecage\GraphQL\Annotations\Attributes\Identifier;
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use Filecage\GraphQL\Annotations\Attributes\Promote;
 use Filecage\GraphQL\Annotations\Enums\ScalarType;
@@ -84,6 +85,14 @@ class ObjectTypeFactory implements TypeFactory {
     private function mapType (?\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : Type {
         if (!$type instanceof \ReflectionNamedType) {
             throw new InvalidTypeException("Missing or invalid return type for {$this->formatExceptionContext($context)}");
+        }
+
+        if (!empty($context->getAttributes(Identifier::class))) {
+            if (!$type->isBuiltin() || !in_array($type->getName(), ['string', 'int'])) {
+                throw new InvalidTypeException("Can not use {$this->formatExceptionContext($context)} as Identifier: ID types must be string or int");
+            }
+
+            return $this->wrapAllowsNull($type->allowsNull(), Type::id());
         }
 
 

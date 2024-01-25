@@ -34,6 +34,19 @@ class User {
 $objectType = $graphQLFactory->forType(User::class);
 ```
 
+### Defining IDs
+To make use of GraphQLs `ID` type (and its caching benefits), add the `Identifier` attribute to a property or a getter/promoted method:
+```php
+class User {
+    function __construct (
+        #[\Filecage\GraphQL\Annotations\Attributes\Identifier]
+        public readonly int $id,
+        public readonly Person $person,
+    ) {}
+}
+```
+Only `int` or `string` types can be used as `Identifier`.
+
 ### Defining Queries
 Queries must inherit from the [`Query`](src/Queries/Query.php) class and provide a description, a return type class name and, if provided, any arguments.
 They also have to implement a resolver method that takes the same arguments as a resolve function in webonyx/graphql-php:
@@ -53,7 +66,7 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
             arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
                 name: 'id',
                 description: "The user's ID",
-                type: \GraphQL\Type\Definition\Type::int()  
+                type: \GraphQL\Type\Definition\Type::id()  
             )
         );
     }
