@@ -4,6 +4,7 @@ namespace Filecage\GraphQL\FactoryTests;
 
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetPetOwners;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUsersUsingArray;
+use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUsersUsingArrayAndAllowNullValues;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUsersUsingIterators;
 use Filecage\GraphQL\FactoryTests\Util\FactoryProvider;
 use Filecage\GraphQL\FactoryTests\Util\MatchesGQLSnapshot;
@@ -15,7 +16,7 @@ class ListTypeTest extends TestCase {
     use FactoryProvider, MatchesGQLSnapshot;
 
     function testExpectsQueryWithListResolvedUsingArray () {
-        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetUsersUsingArray::class)]);
+        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetUsersUsingArray::class, GetUsersUsingArrayAndAllowNullValues::class)]);
         $result = GraphQL::executeQuery($schema, '{GetUsersUsingArray { id, type }}');
 
         $this->assertMatchesGraphQLSchemaSnapshot($schema);
