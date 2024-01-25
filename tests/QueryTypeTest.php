@@ -10,7 +10,6 @@ use Filecage\GraphQL\FactoryTests\Util\MatchesGQLSnapshot;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
-use Spatie\Snapshots\Drivers\JsonDriver;
 
 class QueryTypeTest extends TestCase {
     use FactoryProvider, MatchesGQLSnapshot;
