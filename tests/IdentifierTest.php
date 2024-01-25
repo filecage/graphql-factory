@@ -3,7 +3,7 @@
 namespace Filecage\GraphQL\FactoryTests;
 
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
-use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetCar;
+use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetCarWithScalarId;
 use Filecage\GraphQL\FactoryTests\Fixtures\Types\InvalidIdentifierType;
 use Filecage\GraphQL\FactoryTests\Util\FactoryProvider;
 use Filecage\GraphQL\FactoryTests\Util\MatchesGQLSnapshot;
@@ -17,9 +17,9 @@ class IdentifierTest extends TestCase {
 
     use FactoryProvider, MatchesGQLSnapshot;
 
-    function testExpectsQueryResultWithID () {
-        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetCar::class)]);
-        $result = GraphQL::executeQuery($schema, '{scirocco: GetCar (id: "1") { id, name }, c43: GetCar (id: "2") { id, name }}')
+    function testExpectsQueryResultWithScalarId () {
+        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetCarWithScalarId::class)]);
+        $result = GraphQL::executeQuery($schema, '{scirocco: GetCarWithScalarId (id: "1") { id, name }, c43: GetCarWithScalarId (id: "2") { id, name }}')
             ->setErrorFormatter(fn(Error $error) => ['message' => $error->getMessage()]);
 
         $this->assertMatchesGraphQLSchemaSnapshot($schema);
