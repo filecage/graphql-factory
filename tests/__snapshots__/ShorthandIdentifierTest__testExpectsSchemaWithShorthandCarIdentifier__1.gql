@@ -1,0 +1,12 @@
+type Query {
+  "Loads cars and their identifiers for reduced object type testing"
+  GetCar(
+    "The car's ID"
+    id: ID!
+  ): Car
+}
+
+type Car {
+  id: ID!
+  name: String!
+}

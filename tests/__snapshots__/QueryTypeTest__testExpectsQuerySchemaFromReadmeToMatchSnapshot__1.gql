@@ -2,13 +2,13 @@ type Query {
   "Allows loading the only user we know about"
   GetUser(
     "The user's ID"
-    id: Int
+    id: ID
   ): User
 }
 
 type User {
   "The user ID of this entity"
-  id: Int!
+  id: ID!
 
   person: Person!
   type: UserType!

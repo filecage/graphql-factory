@@ -5,7 +5,7 @@ type Query {
 
 type User {
   "The user ID of this entity"
-  id: Int!
+  id: ID!
 
   person: Person!
   type: UserType!

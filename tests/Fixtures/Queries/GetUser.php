@@ -21,7 +21,7 @@ class GetUser extends Query {
             description: 'Allows loading the only user we know about',
             returnTypeClassName: User::class,
             arguments: new Argument(
-                description: "The user's ID", name: 'id', type: Type::int()
+                description: "The user's ID", name: 'id', type: Type::id()
             )
         );
     }
