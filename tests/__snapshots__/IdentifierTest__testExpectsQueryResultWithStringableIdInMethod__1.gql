@@ -1,0 +1,12 @@
+type Query {
+  "Loads cars and their identifiers for reduced object type testing"
+  GetCarWithStringableIdInMethod(
+    "The car's ID"
+    id: ID!
+  ): CarWithStringableIdInMethod
+}
+
+type CarWithStringableIdInMethod {
+  name: String!
+  id: ID!
+}

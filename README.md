@@ -45,7 +45,7 @@ class User {
     ) {}
 }
 ```
-Only `int` or `string` types can be used as `Identifier`.
+Only `int`, `string` or `Stringable` types can be used as `Identifier`.
 
 ### Defining Queries
 Queries must inherit from the [`Query`](src/Queries/Query.php) class and provide a description, a return type class name and, if provided, any arguments.

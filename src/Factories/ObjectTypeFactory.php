@@ -47,9 +47,11 @@ class ObjectTypeFactory implements TypeFactory {
                 continue;
             }
 
+            $type = $this->mapType($property->getType(), $property);
             yield $property->name => [
-                'type' => $this->mapType($property->getType(), $property),
+                'type' => $type->type,
                 'description' => $this->findDescription($property),
+                'resolve' => $type->resolveFn,
             ];
         }
 
@@ -71,43 +73,59 @@ class ObjectTypeFactory implements TypeFactory {
                 $name = lcfirst(substr($method->name, 3));
             }
 
+            $type = $this->mapType($method->getReturnType(), $method);
             yield $name => [
-                'type' => $this->mapType($method->getReturnType(), $method),
+                'type' => $type->type,
                 'description' => $this->findDescription($method),
                 'resolve' => fn ($rootValue, array $args) => call_user_func([$rootValue, $method->name, ...$args]),
             ];
         }
     }
 
+
     /**
      * @throws InvalidTypeException
      */
-    private function mapType (?\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : Type {
+    private function mapType (?\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : MappedType {
         if (!$type instanceof \ReflectionNamedType) {
             throw new InvalidTypeException("Missing or invalid return type for {$this->formatExceptionContext($context)}");
         }
 
         if (!empty($context->getAttributes(Identifier::class))) {
-            if (!$type->isBuiltin() || !in_array($type->getName(), ['string', 'int'])) {
-                throw new InvalidTypeException("Can not use {$this->formatExceptionContext($context)} as Identifier: ID types must be string or int");
-            }
-
-            return $this->wrapAllowsNull($type->allowsNull(), Type::id());
+            return $this->mapIdentifierType($type, $context);
         }
 
 
         if ($type->isBuiltin()) {
-            return $this->wrapAllowsNull($type->allowsNull(), match($type->getName()) {
+            return new MappedType($this->wrapAllowsNull($type->allowsNull(), match($type->getName()) {
                 'string' => Type::string(),
                 'float' => Type::float(),
                 'int' => Type::int(),
                 'bool' => Type::boolean(),
                 'array' => $this->mapTypeForArray($type, $context),
                 default => throw new InvalidTypeException("Unsupported builtin type `{$type->getName()}` for {$this->formatExceptionContext($context)}"),
-            });
+            }));
         }
 
-        return $this->wrapAllowsNull($type->allowsNull(), $this->factory->forType($type->getName()));
+        return new MappedType($this->wrapAllowsNull($type->allowsNull(), $this->factory->forType($type->getName())));
+    }
+
+    /**
+     * @throws InvalidTypeException
+     */
+    private function mapIdentifierType (\ReflectionNamedType $type, \ReflectionMethod|\ReflectionProperty $context) : MappedType {
+        $resolveFn = null;
+        if (!$type->isBuiltin() && in_array(\Stringable::class, class_implements($type->getName()))) {
+            if ($context instanceof \ReflectionMethod) {
+                $resolveFn = fn($rootValue, array $args) => (string) call_user_func([$rootValue, $context->name, ...$args]);
+            } else {
+                $resolveFn = fn($rootValue, array $args) => $rootValue->{$context->name}->__toString();
+            }
+        } else if (!in_array($type->getName(), ['string', 'int'])) {
+            throw new InvalidTypeException("Can not use {$this->formatExceptionContext($context)} as Identifier: ID types must be string, int or an object implementing `\Stringable`");
+        }
+
+        return new MappedType($this->wrapAllowsNull($type->allowsNull(), Type::id()), $resolveFn);
     }
 
     /**
