@@ -1,0 +1,18 @@
+{
+    "data": {
+        "GetUserByType": [
+            {
+                "person": {
+                    "name": "David",
+                    "nameHashed": "a6b54c20a7b96eeac1a911e6da3124a560fe6dc042ebf270e3676e7095b95652"
+                }
+            },
+            {
+                "person": {
+                    "name": "Also David, but better",
+                    "nameHashed": "bc5c13389b0d45992f2ac5c17d24f6e103892fb112570195d2f452b687371416"
+                }
+            }
+        ]
+    }
+}

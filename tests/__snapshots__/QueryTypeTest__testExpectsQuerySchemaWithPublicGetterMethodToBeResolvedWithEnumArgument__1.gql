@@ -1,0 +1,32 @@
+type Query {
+  "Allows loading users by type"
+  GetUserByType(
+    "The user's type"
+    userType: [UserType]!
+  ): [User!]
+}
+
+enum UserType {
+  "A normal user without any special rights"
+  NormalUser
+
+  "An admin user with the right to rule the world"
+  Admin
+}
+
+type User {
+  "The user ID of this entity"
+  id: ID!
+
+  person: Person!
+  type: UserType!
+}
+
+type Person {
+  name: String!
+
+  "SHA256 hash of the Persons's name"
+  nameHashed: String!
+
+  isCelebrity: Boolean!
+}
