@@ -5,11 +5,13 @@ namespace Filecage\GraphQL\Factory\Factories;
 use Filecage\GraphQL\Factory\Exceptions\GraphQLFactoryException;
 use Filecage\GraphQL\Factory\Interfaces\Arguments\Resolvable;
 use Filecage\GraphQL\Factory\Queries\Argument;
+use Filecage\GraphQL\Factory\Queries\ArgumentType;
 use Generator;
 use GraphQL\Type\Definition\ObjectType;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
 use Filecage\GraphQL\Factory\Factory;
 use Filecage\GraphQL\Factory\Queries\Query;
+use GraphQL\Type\Definition\Type;
 use ReflectionClass;
 use ReflectionException;
 
@@ -83,13 +85,35 @@ final class QueryFactory implements TypeFactory {
         }
     }
 
+    /**
+     * @throws InvalidTypeException
+     */
     private function generateArguments (Query $query) : Generator {
         foreach ($query->arguments as $argument) {
             yield $argument->name => [
-                'type' => $argument->type,
+                'type' => $this->createArgumentType($argument->type),
                 'description' => $argument->description,
             ];
         }
+    }
+
+    /**
+     * @throws InvalidTypeException
+     */
+    private function createArgumentType (Type|ArgumentType $argumentType) : Type {
+        if ($argumentType instanceof Type) {
+            return $argumentType;
+        }
+
+        $type = $this->factory->forType($argumentType->typeClassName);
+
+        // See if we need to transform the argument's type
+        $transformer = $argumentType->transformer;
+        if ($transformer !== null) {
+            $type = $transformer->transform($type);
+        }
+
+        return $type;
     }
 
     /**

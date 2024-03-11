@@ -9,7 +9,7 @@ class Argument {
     function __construct (
         public readonly string $description,
         public readonly string $name,
-        public readonly Type $type,
+        public readonly Type|ArgumentType $type,
     ) {}
     
 }

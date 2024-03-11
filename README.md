@@ -109,6 +109,50 @@ type Person {
 }
 ```
 
+#### Using schema data models or enums as argument
+When using classes or enums as argument types that is also in use for returning data in your schema, you need to define the exact type instance
+from your schema or the schema generation will fail because you're using the same type name twice.
+
+To do that in a convenient way, you can reference your type using the `ArgumentType` class. The factory will then consider its internally knowledge
+of this class and make sure that the same type instance is being used:
+```php
+enum UserType {
+    case Admin;
+    case User;
+}
+
+class GetUserByType extends \Filecage\GraphQL\Factory\Queries\Query {
+    private const USERS = [
+        1 => ['David', UserType::User],
+        2 => ['Also David, but better', UserType::Admin] 
+    ];
+
+    function __construct() {
+        parent::__construct(
+            description: 'Allows loading the first user with a certain type',
+            returnTypeClassName: User::class,
+            arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
+                name: 'id',
+                description: "The user's type",
+                type: new \Filecage\GraphQL\Factory\Queries\ArgumentType(UserType::class)  
+            )
+        );
+    }
+    
+    function resolve(mixed $rootValue = null, array $arguments = []) : ?User {
+        /** @var UserType $type */
+        $type = $arguments['type'];
+        foreach (self::USERS as $id => [$user, $userType]) {
+            if ($userType === $type) {
+                return new User($id, new Person($user));
+            }
+        }
+        
+        return null;
+    }
+}
+```
+
 ### Resolving with dependencies
 It is most likely that when resolving a query, you would want to use a dependency like a database connection or an API client or whatever.
 To do so, a `Query` may return a `callable` instead of an object or `null`. This callable will then be passed to the previously defined
