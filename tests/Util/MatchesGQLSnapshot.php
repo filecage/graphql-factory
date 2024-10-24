@@ -3,6 +3,7 @@
 namespace Filecage\GraphQL\FactoryTests\Util;
 
 use GraphQL\Executor\ExecutionResult;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use Spatie\Snapshots\Drivers\JsonDriver;
 use Spatie\Snapshots\MatchesSnapshots;
@@ -20,6 +21,10 @@ trait MatchesGQLSnapshot {
         }
 
         $this->assertMatchesSnapshot($executionResult, new JsonDriver());
+    }
+
+    function assertMatchesTypeSnapshot (Type $type)  : void {
+        $this->assertMatchesSnapshot($type, new GraphQLDriver());
     }
 
 }

@@ -1,0 +1,32 @@
+type Query {
+  "Generates a list of mixed outputs to test union sub-types"
+  GetPersonOrPet: [PersonOrPet!]
+
+  "Generates a list of mixed outputs to test union sub-types"
+  GetFamilyMembers: [FamilyMember!]
+}
+
+type PersonOrPet {
+  "A Person Or A Pet, it could be both!"
+  personOrPet: PersonOrPetUnion!
+}
+
+union PersonOrPetUnion = Person | Pet
+
+type Person {
+  name: String!
+
+  "SHA256 hash of the Persons's name"
+  nameHashed: String!
+
+  isCelebrity: Boolean!
+}
+
+type Pet {
+  name: String!
+}
+
+type FamilyMember {
+  "A Person Or Pet, why would we make a difference here?"
+  personOrPet: PersonOrPetUnion!
+}

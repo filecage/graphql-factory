@@ -1,0 +1,18 @@
+{
+    "data": {
+        "GetPersonOrPet": [
+            {
+                "personOrPet": {
+                    "__typename": "Person",
+                    "name": "David"
+                }
+            },
+            {
+                "personOrPet": {
+                    "__typename": "Pet",
+                    "name": "Nox"
+                }
+            }
+        ]
+    }
+}
