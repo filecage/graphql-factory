@@ -22,7 +22,7 @@ class UnionTypeTest extends TestCase {
 
     function testExpectsUnionSubtypeToBeResolved () {
         $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetPersonOrPet::class)]);
-        $result = GraphQL::executeQuery($schema, '{GetPersonOrPet () { name }}');
+        $result = GraphQL::executeQuery($schema, '{ GetPersonOrPet { personOrPet { __typename ... on Person { name } ... on Pet { name } } } }');
 
         $this->assertMatchesGraphQLSchemaSnapshot($schema);
         $this->assertMatchesSnapshot($result, new JsonDriver());
@@ -30,7 +30,7 @@ class UnionTypeTest extends TestCase {
 
     function testExpectsSimilarUnionSubtypesToBeResolved () {
         $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetPersonOrPet::class, GetFamilyMembers::class)]);
-        $result = GraphQL::executeQuery($schema, '{personOrPet: GetPersonOrPet () { name }, familyMembers: GetFamilyMembers() { name } }');
+        $result = GraphQL::executeQuery($schema, '{GetPersonOrPet { personOrPet { __typename ... on Person { name } ... on Pet { name } } } GetFamilyMembers  { personOrPet { __typename ... on Person { name } ... on Pet { name } } } }');
 
         $this->assertMatchesGraphQLSchemaSnapshot($schema);
         $this->assertMatchesSnapshot($result, new JsonDriver());

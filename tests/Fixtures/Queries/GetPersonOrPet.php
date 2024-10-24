@@ -4,11 +4,9 @@ namespace Filecage\GraphQL\FactoryTests\Fixtures\Queries;
 
 use Filecage\GraphQL\Factory\Queries\Query;
 use Filecage\GraphQL\Factory\TypeTransformer\IterableTypeTransformer;
-use Filecage\GraphQL\FactoryTests\Fixtures\Containers\PetsContainer;
 use Filecage\GraphQL\FactoryTests\Fixtures\Types\Person;
 use Filecage\GraphQL\FactoryTests\Fixtures\Types\PersonOrPet;
 use Filecage\GraphQL\FactoryTests\Fixtures\Types\Pet;
-use Filecage\GraphQL\FactoryTests\Fixtures\Types\PetOwner;
 
 class GetPersonOrPet extends Query {
 
@@ -20,8 +18,10 @@ class GetPersonOrPet extends Query {
         );
     }
 
-    function resolve(mixed $rootValue = null, array $arguments = []) : \Generator {
-        yield new PersonOrPet(new Person('David'));
-        yield new PersonOrPet(new Pet('Nox'));
+    function resolve (mixed $rootValue = null, array $arguments = []): array {
+        return [
+            new PersonOrPet(new Person('David')),
+            new PersonOrPet(new Pet('Nox')),
+        ];
     }
 }

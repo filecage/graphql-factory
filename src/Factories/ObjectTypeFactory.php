@@ -180,17 +180,19 @@ class ObjectTypeFactory implements TypeFactory {
                 throw new InvalidTypeException("Unsupported union type: A previously defined type alias `{$typeName}` is different to the one of {$this->formatExceptionContext($context)}");
             }
         } else {
-            $mappedTypes = array_map(/** @throws InvalidTypeException */ function (\ReflectionType $type) use ($context) {
+            $objectTypes = [];
+            foreach ($type->getTypes() as $type) {
                 if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
                     throw new InvalidTypeException("Unsupported union type: Union types in GraphQL can only contain named class/object references, but got scalar/unnamed for {$this->formatExceptionContext($context)}");
                 }
 
-                return $this->factory->forType($type->getName());
-            }, $type->getTypes());
+                $objectTypes[$type->getName()] = $this->factory->forType($type->getName());
+            }
 
             $unionType = new UnionType([
                 'name' => $typeName,
-                'types' => $mappedTypes,
+                'types' => $objectTypes,
+                'resolveType' => fn (object $value) : ?ObjectType => $objectTypes[get_class($value)] ?? null,
             ]);
 
             $this->cache->setUnion($typeName, $unionType, $signature);

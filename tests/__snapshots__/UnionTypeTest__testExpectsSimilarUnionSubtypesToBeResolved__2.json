@@ -1,13 +1,32 @@
 {
-    "errors": [
-        {
-            "message": "Syntax Error: Expected Name, found )",
-            "locations": [
-                {
-                    "line": 1,
-                    "column": 31
+    "data": {
+        "GetPersonOrPet": [
+            {
+                "personOrPet": {
+                    "__typename": "Person",
+                    "name": "David"
                 }
-            ]
-        }
-    ]
+            },
+            {
+                "personOrPet": {
+                    "__typename": "Pet",
+                    "name": "Nox"
+                }
+            }
+        ],
+        "GetFamilyMembers": [
+            {
+                "personOrPet": {
+                    "__typename": "Person",
+                    "name": "David"
+                }
+            },
+            {
+                "personOrPet": {
+                    "__typename": "Pet",
+                    "name": "Nox"
+                }
+            }
+        ]
+    }
 }
