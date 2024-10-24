@@ -2,6 +2,7 @@
 
 namespace Filecage\GraphQL\Factory;
 
+use Filecage\GraphQL\Factory\Factories\Cache;
 use Filecage\GraphQL\Factory\Factories\EnumTypeFactory;
 use Filecage\GraphQL\Factory\Factories\IterableObjectTypeFactory;
 use Filecage\GraphQL\Factory\Interfaces\Types\Cacheable;
@@ -17,17 +18,14 @@ final class Factory {
      * @var callable
      */
     private $resolveFinalize;
-
-    /**
-     * @var array<class-string, Type>
-     */
-    private array $cache = [];
+    private readonly Cache $cache;
 
     /**
      * @param callable $resolveFinalize a function that accepts a callable with arbitrary parameters as first argument
      */
     function __construct (callable $resolveFinalize) {
         $this->resolveFinalize = $resolveFinalize;
+        $this->cache = new Cache();
     }
 
     function forQuery (string ...$queryClassNames) : Type {
@@ -40,7 +38,7 @@ final class Factory {
      * @throws InvalidTypeException
      */
     function forType (string $className) : Type {
-        if (!isset($this->cache[$className])) {
+        if (!$this->cache->has($className)) {
             $reflection = self::reflect($className);
             if ($reflection instanceof \ReflectionEnum) {
                 $factory = new EnumTypeFactory($reflection);
@@ -58,25 +56,25 @@ final class Factory {
                 // created the type. This is not ideal for obvious reasons, but we still have to respect
                 // that an instance of a type may only appear once in the whole schema
                 $cacheName = $type->getCacheTypeName();
-                $cachedType = $this->cache[$cacheName] ?? null;
+                $cachedType = $this->cache->get($cacheName);
                 if ($cachedType === null) {
                     // This is the first time this type has appeared in the schema, cache this instance
                     // for later use
-                    $this->cache[$cacheName] = $type;
+                    $this->cache->set($cacheName, $type);
                 } else {
                     // This type has appeared previously, but not under this class name. Store a reference
                     // in the cache with the requested class name and then exit early with the previously
                     // cached type
-                    $this->cache[$className] = $cachedType;
+                    $this->cache->set($className, $cachedType);
 
                     return $cachedType;
                 }
             }
 
-            $this->cache[$className] = $type;
+            $this->cache->set($className, $type);
         }
 
-        return $this->cache[$className];
+        return $this->cache->get($className);
     }
 
     /**
