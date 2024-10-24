@@ -1,0 +1,13 @@
+{
+    "errors": [
+        {
+            "message": "Syntax Error: Expected Name, found )",
+            "locations": [
+                {
+                    "line": 1,
+                    "column": 31
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+type UnionTypeWithSameSignatureButNullableAndNonNullable {
+  personOrPet: PersonOrPet!
+  personOrPetOrNull: PersonOrPet
+}
