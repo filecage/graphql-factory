@@ -6,12 +6,14 @@ use Filecage\GraphQL\Annotations\Attributes\Contains;
 use Filecage\GraphQL\Annotations\Attributes\Identifier;
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use Filecage\GraphQL\Annotations\Attributes\Promote;
+use Filecage\GraphQL\Annotations\Attributes\TypeAlias;
 use Filecage\GraphQL\Annotations\Enums\ScalarType;
 use GraphQL\Type\Definition\Description;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
 use Filecage\GraphQL\Factory\Factory;
+use GraphQL\Type\Definition\UnionType;
 use SensitiveParameter;
 
 /**
@@ -88,6 +90,10 @@ class ObjectTypeFactory implements TypeFactory {
      * @throws InvalidTypeException
      */
     private function mapType (?\ReflectionType $type, \ReflectionMethod|\ReflectionProperty $context) : MappedType {
+        if ($type instanceof \ReflectionUnionType) {
+            return $this->mapUnionType($type, $context);
+        }
+
         if (!$type instanceof \ReflectionNamedType) {
             throw new InvalidTypeException("Missing or invalid return type for {$this->formatExceptionContext($context)}");
         }
@@ -159,6 +165,40 @@ class ObjectTypeFactory implements TypeFactory {
         };
     }
 
+    private function mapUnionType (\ReflectionUnionType $type, \ReflectionMethod|\ReflectionProperty $context) : MappedType {
+        /** @var TypeAlias|null $typeAliasAttribute */
+        $typeAliasAttribute = $context->getAttributes(TypeAlias::class)[0]?->newInstance() ?? null;
+        if ($typeAliasAttribute === null) {
+            throw new InvalidTypeException("Missing union type `TypeAlias` attribute declaration for {$this->formatExceptionContext($context)}");
+        }
+
+        // Union types are unique within the whole schema, so ensure that every name only exists once but the signature should never differ
+        $typeName = $typeAliasAttribute->getTypeAlias();
+        $signature = $this->getUnionTypeSignature($type);
+        if ($this->cache->hasUnion($typeName)) {
+            if ($this->cache->getUnionSignature($typeName) !== $signature) {
+                throw new InvalidTypeException("Unsupported union type: A previously defined type alias `{$typeName}` is different to the one of {$this->formatExceptionContext($context)}");
+            }
+        } else {
+            $mappedTypes = array_map(/** @throws InvalidTypeException */ function (\ReflectionType $type) use ($context) {
+                if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+                    throw new InvalidTypeException("Unsupported union type: Union types in GraphQL can only contain named class/object references, but got scalar/unnamed for {$this->formatExceptionContext($context)}");
+                }
+
+                return $this->factory->forType($type->getName());
+            }, $type->getTypes());
+
+            $unionType = new UnionType([
+                'name' => $typeName,
+                'types' => $mappedTypes,
+            ]);
+
+            $this->cache->setUnion($typeName, $unionType, $signature);
+        }
+
+        return new MappedType($this->wrapAllowsNull($type->allowsNull(), $this->cache->getUnionType($typeName)));
+    }
+
     protected function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
         return $allowsNull ? $type : Type::nonNull($type);
     }
@@ -192,6 +232,13 @@ class ObjectTypeFactory implements TypeFactory {
         $description = $descriptions[0]->newInstance();
 
         return $description->description;
+    }
+
+    private function getUnionTypeSignature (\ReflectionUnionType $type) : string {
+        $signature = array_filter(array_map(fn(\ReflectionNamedType|\ReflectionIntersectionType $type) => ($type->isBuiltin() && $type->getName() === 'null') ? null : $type->getName(), $type->getTypes()));
+        sort($signature);
+
+        return hash('xxh3', join('|', $signature));
     }
 
     private function formatExceptionContext (\ReflectionMethod|\ReflectionProperty $context) : string {
