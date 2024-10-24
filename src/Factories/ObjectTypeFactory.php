@@ -24,6 +24,7 @@ class ObjectTypeFactory implements TypeFactory {
      */
     function __construct (
         private readonly Factory $factory,
+        private readonly Cache $cache,
         private readonly \ReflectionClass $reflectionClass
     ) {}
 

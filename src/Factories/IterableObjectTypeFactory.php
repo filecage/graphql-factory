@@ -13,10 +13,11 @@ use GraphQL\Type\Definition\Type;
 final class IterableObjectTypeFactory extends ObjectTypeFactory {
 
     function __construct(
-        private readonly Factory $factory,
+        Factory $factory,
+        Cache $cache,
         private readonly \ReflectionClass $reflectionClass,
     ) {
-        parent::__construct($this->factory, $this->reflectionClass);
+        parent::__construct($factory, $cache, $this->reflectionClass);
     }
 
     function create (): Type {

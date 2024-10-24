@@ -45,9 +45,9 @@ final class Factory {
             } elseif ($reflection->isInternal()) {
                 $factory = new InternalClassReflection($reflection);
             } elseif ($reflection->isIterateable()) {
-                $factory = new IterableObjectTypeFactory($this, $reflection);
+                $factory = new IterableObjectTypeFactory($this, $this->cache, $reflection);
             } else {
-                $factory = new ObjectTypeFactory($this, $reflection);
+                $factory = new ObjectTypeFactory($this, $this->cache, $reflection);
             }
 
             $type = $factory->create();
