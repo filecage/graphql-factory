@@ -33,7 +33,7 @@ class ObjectTypeFactory implements TypeFactory {
     function create () : Type {
         return new ObjectType([
             'name' => $this->reflectionClass->getShortName(),
-            'fields' => [...$this->generateFields()]
+            'fields' => [...$this->generateFields()],
         ]);
     }
 
