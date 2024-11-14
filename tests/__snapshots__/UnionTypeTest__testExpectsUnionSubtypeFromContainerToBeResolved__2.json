@@ -1,0 +1,14 @@
+{
+    "data": {
+        "GetPersonOrPetContainer": [
+            {
+                "__typename": "Person",
+                "name": "David"
+            },
+            {
+                "__typename": "Pet",
+                "name": "Nox"
+            }
+        ]
+    }
+}

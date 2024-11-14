@@ -8,8 +8,8 @@ use Filecage\GraphQL\FactoryTests\Fixtures\Types\Pet;
 #[Contains(Pet::class)]
 class PetsContainer extends \ArrayIterator {
 
-    function __construct(Pet ...$pets) {
-        parent::__construct($pets);
+    function __construct(Pet ...$peopleOrPets) {
+        parent::__construct($peopleOrPets);
     }
 
 }

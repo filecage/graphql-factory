@@ -39,7 +39,7 @@ final class Cache {
         return array_key_exists($key, $this->unions);
     }
 
-    function getUnionType (string $key) : ?Type {
+    function getUnionType (string $key) : ?UnionType {
         return $this->unions[$key]['type'] ?? null;
     }
 
@@ -47,7 +47,7 @@ final class Cache {
         return $this->unions[$key]['signature'] ?? null;
     }
 
-    function setUnion (string $key, Type $type, string $signature) : void {
+    function setUnion (string $key, UnionType $type, string $signature) : void {
         $this->unions[$key] = [
             'signature' => $signature,
             'type' => $type,

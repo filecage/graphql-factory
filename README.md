@@ -153,25 +153,6 @@ class GetUserByType extends \Filecage\GraphQL\Factory\Queries\Query {
 }
 ```
 
-#### Using Union Return Types
-GraphQL and PHP both support union types. However, GraphQL requires them to be [named and unique](https://graphql.org/learn/schema/#union-types)
-throughout a schema. This is why all union types need to be named using the `TypeAlias` attribute annotation:
-
-```php
-class MyModel {
-    #[\Filecage\GraphQL\Annotations\Attributes\TypeAlias('FooBarUnion')]
-    public readonly Foo|Bar $baz;
-}
-```
-
-The `TypeAlias` attribute accepts enums and will use the enum's name or, if it's string backed, its value. 
-
-If this annotation is missing, the library will throw an `InvalidTypeException` with the message
-> Missing union type `TypeAlias` attribute declaration
-upon creating the type.
-
-The library will also ensure that return signatures match when using identical union type names.
-
 ### Resolving with dependencies
 It is most likely that when resolving a query, you would want to use a dependency like a database connection or an API client or whatever.
 To do so, a `Query` may return a `callable` instead of an object or `null`. This callable will then be passed to the previously defined
@@ -225,6 +206,39 @@ class Person {
     function isCelebrity() {} // This will be part of the schema because it has the `Promote` attribute
 }
 ```
+
+#### Resolving Union Types
+GraphQL and PHP both support union types. However, GraphQL requires them to be [named and unique](https://graphql.org/learn/schema/#union-types)
+throughout a schema. This is why all union types need to be named using the `TypeAlias` attribute annotation:
+
+Additionally, only object types are allowed as union types in GraphQL.
+
+#### Single Attribute Union Type
+```php
+class MyModel {
+    #[\Filecage\GraphQL\Annotations\Attributes\TypeAlias('FooBarUnion')]
+    public readonly Foo|Bar $baz;
+}
+```
+
+#### List Attribute Union Type
+```php
+class MyModel {
+    #[\Filecage\GraphQL\Annotations\Attributes\Contains(Foo::class)];
+    #[\Filecage\GraphQL\Annotations\Attributes\Contains(Bar::class)];
+    #[\Filecage\GraphQL\Annotations\Attributes\TypeAlias('FooBarUnion')]
+    public readonly array $baz;
+}
+```
+
+#### Managing Union Type Names Throughout The Schema
+The `TypeAlias` attribute accepts enums and will use the enum's name or, if it's string backed, its value.
+
+If this annotation is missing, the library will throw an `InvalidTypeException` with the message
+> Missing union type `TypeAlias` attribute declaration
+upon creating the type.
+
+The library will also ensure that return signatures match when using identical union type names.
 
 ### Resolving Internal Types
 Some internal types will be mapped, so they won't break your existing interface. A good example is `DateTimeInterface`, that
