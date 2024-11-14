@@ -20,16 +20,15 @@ final class IterableObjectTypeFactory extends ObjectTypeFactory {
         parent::__construct($factory, $cache, $this->reflectionClass);
     }
 
+    /**
+     * @throws InvalidTypeException
+     */
     function create (): Type {
         $contains = $this->reflectionClass->getAttributes(Contains::class);
         if (empty($contains)) {
             return parent::create();
         }
 
-        if (count($contains) > 1) {
-            throw new InvalidTypeException("Type clarification is too ambiguous (expected none or exactly 1 `Contains` attribute) for iterator `{{$this->reflectionClass->getName()}}`");
-        }
-
-        return $this->mapTypeForContains($contains[0]->newInstance());
+        return $this->mapTypeForContains($this->reflectionClass, ...array_map(fn(\ReflectionAttribute $contains) => $contains->newInstance(), $contains));
     }
 }

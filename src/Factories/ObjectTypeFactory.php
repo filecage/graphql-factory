@@ -140,19 +140,38 @@ class ObjectTypeFactory implements TypeFactory {
      */
     protected function mapTypeForArray (\ReflectionType $type, \ReflectionMethod|\ReflectionProperty|\ReflectionClass $context) : Type {
         $contains = $context->getAttributes(Contains::class);
-        if (count($contains) !== 1) {
-            throw new InvalidTypeException("Type clarification for array type is missing or too ambiguous (expected exactly 1 `Contains` attribute) for {$this->formatExceptionContext($context)}");
+        if (count($contains) < 1) {
+            throw new InvalidTypeException("Type clarification for array type is missing (expected at least one `Contains` attribute) for {$this->formatExceptionContext($context)}");
         }
 
-        return $this->mapTypeForContains($contains[0]->newInstance());
+        return $this->mapTypeForContains($context, ...array_map(fn(\ReflectionAttribute $contains) => $contains->newInstance(), $contains));
     }
 
-    protected function mapTypeForContains (Contains $contains) : Type {
-        if (is_string($contains->type)) {
-            return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $this->factory->forType($contains->type)));
+    /**
+     * @throws InvalidTypeException
+     */
+    protected function mapTypeForContains (\ReflectionMethod|\ReflectionProperty|\ReflectionClass $context, Contains ...$contains) : Type {
+        if (count($contains) === 1) {
+            if (is_string($contains[0]->type)) {
+                return Type::listOf($this->wrapAllowsNull($contains[0]->allowsNull, $this->factory->forType($contains[0]->type)));
+            }
+
+            return Type::listOf($this->wrapAllowsNull($contains[0]->allowsNull, $this->mapScalarTypeToGraphQLType($contains[0]->type)));
         }
 
-        return Type::listOf($this->wrapAllowsNull($contains->allowsNull, $this->mapScalarTypeToGraphQLType($contains->type)));
+        // Union Type Contains, yay, fun!
+        $typeName = $this->findTypeAlias($context)->getTypeAlias();
+        // Only object types are allowed in a union type
+        $classNames = array_map(fn(Contains $contains) => is_string($contains->type) ? $contains->type : throw new InvalidTypeException(
+            "Unsupported union type: Union types in GraphQL can only contain named class/object references, but got scalar/unnamed for {$this->formatExceptionContext($context)}"
+        ), $contains);
+
+        $signature = $this->getUnionSignatureFromContains(...$contains);
+        if (!$this->hasUnionTypeCached($typeName, $signature, $context)) {
+            $this->cache->setUnion($typeName, $this->createUnionType($typeName, ...$classNames), $signature);
+        }
+
+        return Type::listOf($this->wrapAllowsNull(false, $this->cache->getUnionType($typeName)));
     }
 
     private function mapScalarTypeToGraphQLType (ScalarType $scalarType) : Type {
@@ -165,40 +184,58 @@ class ObjectTypeFactory implements TypeFactory {
         };
     }
 
+    /**
+     * @throws InvalidTypeException
+     */
     private function mapUnionType (\ReflectionUnionType $type, \ReflectionMethod|\ReflectionProperty $context) : MappedType {
-        /** @var TypeAlias|null $typeAliasAttribute */
-        $typeAliasAttribute = $context->getAttributes(TypeAlias::class)[0]?->newInstance() ?? null;
-        if ($typeAliasAttribute === null) {
-            throw new InvalidTypeException("Missing union type `TypeAlias` attribute declaration for {$this->formatExceptionContext($context)}");
-        }
+        $typeName = $this->findTypeAlias($context)->getTypeAlias();
+        $signature = $this->getUnionSignatureFromReflectionUnionType($type);
 
-        // Union types are unique within the whole schema, so ensure that every name only exists once but the signature should never differ
-        $typeName = $typeAliasAttribute->getTypeAlias();
-        $signature = $this->getUnionTypeSignature($type);
-        if ($this->cache->hasUnion($typeName)) {
-            if ($this->cache->getUnionSignature($typeName) !== $signature) {
-                throw new InvalidTypeException("Unsupported union type: A previously defined type alias `{$typeName}` is different to the one of {$this->formatExceptionContext($context)}");
-            }
-        } else {
-            $objectTypes = [];
-            foreach ($type->getTypes() as $type) {
+        if (!$this->hasUnionTypeCached($typeName, $signature, $context)) {
+            $classNames = array_map(function(\ReflectionType $type) use ($context) {
                 if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
                     throw new InvalidTypeException("Unsupported union type: Union types in GraphQL can only contain named class/object references, but got scalar/unnamed for {$this->formatExceptionContext($context)}");
                 }
 
-                $objectTypes[$type->getName()] = $this->factory->forType($type->getName());
-            }
+                return $type->getName();
+            }, $type->getTypes());
 
-            $unionType = new UnionType([
-                'name' => $typeName,
-                'types' => $objectTypes,
-                'resolveType' => fn (object $value) : ?ObjectType => $objectTypes[get_class($value)] ?? null,
-            ]);
-
-            $this->cache->setUnion($typeName, $unionType, $signature);
+            $this->cache->setUnion($typeName, $this->createUnionType($typeName, ...$classNames), $signature);
         }
 
         return new MappedType($this->wrapAllowsNull($type->allowsNull(), $this->cache->getUnionType($typeName)));
+    }
+
+    /**
+     * @param string $typeName
+     * @param string ...$classNames
+     *
+     * @return UnionType
+     * @throws InvalidTypeException
+     */
+    private function createUnionType (string $typeName, string ...$classNames) : UnionType {
+        $objectTypes = array_map(fn(string $className) => $this->factory->forType($className), array_combine($classNames, $classNames));
+
+        return new UnionType([
+            'name' => $typeName,
+            'types' => $objectTypes,
+            'resolveType' => fn (object $value) : ?ObjectType => $objectTypes[get_class($value)] ?? null,
+        ]);
+    }
+
+    /**
+     * @throws InvalidTypeException
+     */
+    private function hasUnionTypeCached (string $typeName, string $signature, \ReflectionProperty|\ReflectionMethod|\ReflectionClass $context) : bool {
+        if (!$this->cache->hasUnion($typeName)) {
+            return false;
+        }
+
+        if ($this->cache->getUnionSignature($typeName) !== $signature) {
+            throw new InvalidTypeException("Unsupported union type: A previously defined type alias `{$typeName}` is different to the one of {$this->formatExceptionContext($context)}");
+        }
+
+        return true;
     }
 
     protected function wrapAllowsNull (bool $allowsNull, Type $type) : Type {
@@ -224,6 +261,19 @@ class ObjectTypeFactory implements TypeFactory {
         return !empty($skipProperties);
     }
 
+    /**
+     * @throws InvalidTypeException
+     */
+    private function findTypeAlias (\ReflectionMethod|\ReflectionProperty|\ReflectionClass $typeAliasAware) : TypeAlias {
+        /** @var \ReflectionAttribute|null $typeAliasAttribute */
+        $typeAliasAttribute = $typeAliasAware->getAttributes(TypeAlias::class)[0] ?? null;
+        if ($typeAliasAttribute === null) {
+            throw new InvalidTypeException("Missing union type `TypeAlias` attribute declaration for {$this->formatExceptionContext($typeAliasAware)}");
+        }
+
+        return $typeAliasAttribute->newInstance();
+    }
+
     private function findDescription (\ReflectionMethod|\ReflectionProperty $descriptionAware) : ?string {
         $descriptions = $descriptionAware->getAttributes(Description::class);
         if (empty($descriptions)) {
@@ -236,14 +286,29 @@ class ObjectTypeFactory implements TypeFactory {
         return $description->description;
     }
 
-    private function getUnionTypeSignature (\ReflectionUnionType $type) : string {
+    private function getUnionSignatureFromReflectionUnionType (\ReflectionUnionType $type) : string {
         $signature = array_filter(array_map(fn(\ReflectionNamedType|\ReflectionIntersectionType $type) => ($type->isBuiltin() && $type->getName() === 'null') ? null : $type->getName(), $type->getTypes()));
-        sort($signature);
 
-        return hash('xxh3', join('|', $signature));
+        return $this->hashUnionSignature($signature);
     }
 
-    private function formatExceptionContext (\ReflectionMethod|\ReflectionProperty $context) : string {
+    private function getUnionSignatureFromContains (Contains ...$contains) : string {
+        $signature = array_filter(array_map(fn(Contains $contains) => $contains->type, $contains));
+
+        return $this->hashUnionSignature($signature);
+    }
+
+    private function hashUnionSignature (array $signatureBits) : string {
+        sort($signatureBits);
+
+        return hash('xxh3', join('|', $signatureBits));
+    }
+
+    private function formatExceptionContext (\ReflectionMethod|\ReflectionProperty|\ReflectionClass $context) : string {
+        if ($context instanceof \ReflectionClass) {
+            return "class `{$context->name}`";
+        }
+
         if ($context instanceof \ReflectionMethod) {
             return "return type of `{$context->class}::{$context->name}()`";
         }

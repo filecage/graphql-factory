@@ -1,0 +1,19 @@
+type Query {
+  "Generates a list of mixed outputs to test union sub-types containers"
+  GetPersonOrPetContainer: [PersonOrPetContainerUnion!]
+}
+
+union PersonOrPetContainerUnion = Pet | Person
+
+type Pet {
+  name: String!
+}
+
+type Person {
+  name: String!
+
+  "SHA256 hash of the Persons's name"
+  nameHashed: String!
+
+  isCelebrity: Boolean!
+}
