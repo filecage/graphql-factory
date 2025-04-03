@@ -4,6 +4,7 @@ namespace Filecage\GraphQL\FactoryTests;
 
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetDateTime;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetDifferentTimes;
+use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetSomething;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUser;
 use Filecage\GraphQL\FactoryTests\Fixtures\Queries\GetUserByType;
 use Filecage\GraphQL\FactoryTests\Util\FactoryProvider;
@@ -45,6 +46,13 @@ class QueryTypeTest extends TestCase {
     function testExpectsQuerySchemaWithDateTimeInterfaceValue () {
         $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetDateTime::class, GetDifferentTimes::class)]);
         $result = GraphQL::executeQuery($schema, '{GetDateTime { iso8601, ymd, hms, tz } }');
+
+        $this->assertMatchesQuerySnapshot($result);
+    }
+
+    function testExpectsQuerySchemaWithEmptyObjectType () {
+        $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetSomething::class)]);
+        $result = GraphQL::executeQuery($schema, '{ GetSomething { _ } }');
 
         $this->assertMatchesQuerySnapshot($result);
     }
