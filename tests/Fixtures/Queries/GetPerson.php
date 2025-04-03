@@ -3,7 +3,6 @@
 namespace Filecage\GraphQL\FactoryTests\Fixtures\Queries;
 
 use Filecage\GraphQL\Factory\Queries\Query;
-use Filecage\GraphQL\FactoryTests\Fixtures\Arguments\UserId;
 use Filecage\GraphQL\FactoryTests\Fixtures\Arguments\UserByIdArgument;
 use Filecage\GraphQL\FactoryTests\Fixtures\Types\Person;
 
