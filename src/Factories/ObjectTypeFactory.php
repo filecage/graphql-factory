@@ -7,6 +7,7 @@ use Filecage\GraphQL\Annotations\Attributes\Identifier;
 use Filecage\GraphQL\Annotations\Attributes\Ignore;
 use Filecage\GraphQL\Annotations\Attributes\Promote;
 use Filecage\GraphQL\Annotations\Attributes\TypeAlias;
+use Filecage\GraphQL\Annotations\Attributes\EmptyType;
 use Filecage\GraphQL\Annotations\Enums\ScalarType;
 use GraphQL\Type\Definition\Description;
 use GraphQL\Type\Definition\ObjectType;
@@ -43,6 +44,14 @@ class ObjectTypeFactory implements TypeFactory {
     private function generateFields () : \Generator {
         if ($this->reflectionClass->isInternal()) {
             throw new InvalidTypeException("Unsupported internal class `{$this->reflectionClass->name}`");
+        }
+
+        if (!empty($this->reflectionClass->getAttributes(EmptyType::class))) {
+            // Yield dummy boolean field `_`, then return (so void always has no outputs)
+            yield '_' => [
+                'type' => Type::boolean(),
+                'description' => 'Dummy value for empty object type. Do not query.',
+            ];
         }
 
         foreach ($this->reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
