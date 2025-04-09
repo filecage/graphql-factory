@@ -5,6 +5,8 @@ namespace Filecage\GraphQL\Factory;
 use Filecage\GraphQL\Factory\Factories\Cache;
 use Filecage\GraphQL\Factory\Factories\EnumTypeFactory;
 use Filecage\GraphQL\Factory\Factories\IterableObjectTypeFactory;
+use Filecage\GraphQL\Factory\Factories\TypePromiseFactory;
+use Filecage\GraphQL\Factory\Interfaces\TypePromise;
 use Filecage\GraphQL\Factory\Interfaces\Types\Cacheable;
 use GraphQL\Type\Definition\Type;
 use Filecage\GraphQL\Factory\Exceptions\InvalidTypeException;
@@ -46,6 +48,8 @@ final class Factory {
                 $factory = new InternalClassReflection($reflection);
             } elseif ($reflection->isIterateable()) {
                 $factory = new IterableObjectTypeFactory($this, $this->cache, $reflection);
+            } elseif ($reflection->implementsInterface(TypePromise::class)) {
+                $factory = new TypePromiseFactory($this, $reflection);
             } else {
                 $factory = new ObjectTypeFactory($this, $this->cache, $reflection);
             }
