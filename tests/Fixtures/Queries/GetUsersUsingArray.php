@@ -25,8 +25,7 @@ class GetUsersUsingArray extends Query {
 
     function __construct(bool $allowNullValues = false) {
         parent::__construct(
-            description: 'Allows listing all users and uses an array internally',
-            returnTypeClassName: User::class,
+            description: 'Allows listing all users and uses an array internally', returnType: User::class,
             transformer: new IterableTypeTransformer($allowNullValues)
         );
     }

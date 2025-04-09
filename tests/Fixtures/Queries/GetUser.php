@@ -18,8 +18,7 @@ class GetUser extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Allows loading the only user we know about',
-            returnTypeClassName: User::class,
+            description: 'Allows loading the only user we know about', returnType: User::class,
             arguments: new Argument(
                 description: "The user's ID", name: 'id', type: Type::id()
             )

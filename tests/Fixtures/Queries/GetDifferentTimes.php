@@ -9,8 +9,7 @@ class GetDifferentTimes extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Returns two different times',
-            returnTypeClassName: TwoDifferentTimes::class
+            description: 'Returns two different times', returnType: TwoDifferentTimes::class
         );
     }
     function resolve(mixed $rootValue = null, array $arguments = []) : ?TwoDifferentTimes {

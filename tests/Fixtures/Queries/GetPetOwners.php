@@ -12,7 +12,7 @@ use Filecage\GraphQL\FactoryTests\Fixtures\Types\PetOwner;
 class GetPetOwners extends Query {
 
     function __construct () {
-        parent::__construct(description: 'Generates a list with wrapped sub-lists using an ArrayIterator instance', returnTypeClassName: PetOwner::class, transformer: new IterableTypeTransformer());
+        parent::__construct(description: 'Generates a list with wrapped sub-lists using an ArrayIterator instance', returnType: PetOwner::class, transformer: new IterableTypeTransformer());
     }
 
     function resolve (mixed $rootValue = null, array $arguments = []): \Generator {

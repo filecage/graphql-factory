@@ -19,8 +19,7 @@ class GetCarWithScalarId extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Loads cars and their identifiers for reduced object type testing',
-            returnTypeClassName: CarWithScalarId::class,
+            description: 'Loads cars and their identifiers for reduced object type testing', returnType: CarWithScalarId::class,
             arguments: new Argument(
                 description: "The car's ID", name: 'id', type: Type::nonNull(Type::id())
             )

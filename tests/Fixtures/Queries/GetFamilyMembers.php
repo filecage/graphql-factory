@@ -15,8 +15,7 @@ class GetFamilyMembers extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Generates a list of mixed outputs to test union sub-types',
-            returnTypeClassName: FamilyMember::class,
+            description: 'Generates a list of mixed outputs to test union sub-types', returnType: FamilyMember::class,
             transformer: new IterableTypeTransformer(),
         );
     }

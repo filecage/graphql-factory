@@ -22,8 +22,7 @@ class GetCarWithStringableIdInMethod extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Loads cars and their identifiers for reduced object type testing',
-            returnTypeClassName: CarWithStringableIdInMethod::class,
+            description: 'Loads cars and their identifiers for reduced object type testing', returnType: CarWithStringableIdInMethod::class,
             arguments: new Argument(
                 description: "The car's ID", name: 'id', type: Type::nonNull(Type::id())
             )

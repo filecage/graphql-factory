@@ -8,8 +8,7 @@ class GetDateTime extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Returns the date time of 2023-11-24 12:34:56 in UTC',
-            returnTypeClassName: \DateTimeInterface::class
+            description: 'Returns the date time of 2023-11-24 12:34:56 in UTC', returnType: \DateTimeInterface::class
         );
     }
     function resolve(mixed $rootValue = null, array $arguments = []) : ?\DateTimeInterface {

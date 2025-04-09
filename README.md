@@ -52,6 +52,7 @@ Queries must inherit from the [`Query`](src/Queries/Query.php) class and provide
 They also have to implement a resolver method that takes the same arguments as a resolve function in webonyx/graphql-php:
 
 Let's build a query to get our user models based on the ID:
+
 ```php
 class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     private const USERS = [
@@ -62,7 +63,7 @@ class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     function __construct() {
         parent::__construct(
             description: 'Allows loading the only user we know about',
-            returnTypeClassName: User::class,
+            returnType: User::class,
             arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
                 name: 'id',
                 description: "The user's ID",
@@ -115,6 +116,7 @@ from your schema or the schema generation will fail because you're using the sam
 
 To do that in a convenient way, you can reference your type using the `ArgumentType` class. The factory will then consider its internally knowledge
 of this class and make sure that the same type instance is being used:
+
 ```php
 enum UserType {
     case Admin;
@@ -130,7 +132,7 @@ class GetUserByType extends \Filecage\GraphQL\Factory\Queries\Query {
     function __construct() {
         parent::__construct(
             description: 'Allows loading the first user with a certain type',
-            returnTypeClassName: User::class,
+            returnType: User::class,
             arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
                 name: 'id',
                 description: "The user's type",
@@ -197,12 +199,13 @@ $creator = new \Creator\Creator();
 $graphQLFactory = new \Filecage\GraphQL\Factory\Factory(fn (callable $resolved) => $creator->invoke($resolved));
 ```
 Having set up a dependency resolver like Creator, our query example could now look like this:
+
 ```php
 class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     function __construct() {
         parent::__construct(
             description: 'Allows loading users from our UserLoader',
-            returnTypeClassName: User::class,
+            returnType: User::class,
             arguments: new \Filecage\GraphQL\Factory\Queries\Argument(
                 name: 'id',
                 description: "The user's ID",
@@ -293,12 +296,13 @@ class UserIdArgument {
 }
 ```
 I call this pattern 'argument fixture'. Use your Argument Fixture in any given query then:
+
 ```php
 class GetUser extends \Filecage\GraphQL\Factory\Queries\Query {
     function __construct() {
         parent::__construct(
             description: 'Allows loading users from our UserLoader',
-            returnTypeClassName: User::class,
+            returnType: User::class,
             arguments: new UserIdArgument()
         )
     }

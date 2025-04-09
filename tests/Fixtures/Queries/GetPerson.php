@@ -10,8 +10,7 @@ class GetPerson extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Allows loading the only user we know about',
-            returnTypeClassName: Person::class,
+            description: 'Allows loading the only user we know about', returnType: Person::class,
             arguments: new UserByIdArgument()
         );
     }

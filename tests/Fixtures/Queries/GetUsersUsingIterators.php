@@ -14,8 +14,7 @@ class GetUsersUsingIterators extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Allows listing all users and uses an iterator internally',
-            returnTypeClassName: User::class,
+            description: 'Allows listing all users and uses an iterator internally', returnType: User::class,
             transformer: new IterableTypeTransformer()
         );
     }

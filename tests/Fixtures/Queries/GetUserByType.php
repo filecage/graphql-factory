@@ -20,8 +20,7 @@ class GetUserByType extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Allows loading users by type',
-            returnTypeClassName: User::class,
+            description: 'Allows loading users by type', returnType: User::class,
             transformer: new IterableTypeTransformer(),
             arguments: new UserTypeArgument(),
         );

@@ -21,8 +21,7 @@ class GetCarWithStringableId extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Loads cars and their identifiers for reduced object type testing',
-            returnTypeClassName: CarWithStringableId::class,
+            description: 'Loads cars and their identifiers for reduced object type testing', returnType: CarWithStringableId::class,
             arguments: new Argument(
                 description: "The car's ID", name: 'id', type: Type::nonNull(Type::id())
             )

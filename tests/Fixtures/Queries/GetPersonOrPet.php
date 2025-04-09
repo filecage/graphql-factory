@@ -12,8 +12,7 @@ class GetPersonOrPet extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Generates a list of mixed outputs to test union sub-types',
-            returnTypeClassName: PersonOrPet::class,
+            description: 'Generates a list of mixed outputs to test union sub-types', returnType: PersonOrPet::class,
             transformer: new IterableTypeTransformer(),
         );
     }

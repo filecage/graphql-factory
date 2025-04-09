@@ -11,8 +11,7 @@ class GetPersonOrPetContainer extends Query {
 
     function __construct() {
         parent::__construct(
-            description: 'Generates a list of mixed outputs to test union sub-types containers',
-            returnTypeClassName: PersonOrPetContainer::class,
+            description: 'Generates a list of mixed outputs to test union sub-types containers', returnType: PersonOrPetContainer::class,
         );
     }
 
