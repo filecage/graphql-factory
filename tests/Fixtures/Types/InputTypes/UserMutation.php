@@ -18,6 +18,10 @@ final class UserMutation implements TypePromise {
                 ],
                 'type' => [
                     'type' => Type::nonNull($factory->forType(UserType::class)),
+                ],
+                'additionally' => [
+                    'type' => $factory->forType(SomeSubtypeInput::class),
+                    'description' => 'This is to test a promise type within a promise',
                 ]
             ],
         ]);

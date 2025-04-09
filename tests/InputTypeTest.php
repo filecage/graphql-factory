@@ -23,7 +23,7 @@ class InputTypeTest extends TestCase {
         $mutation->name = 'Mutation';
 
         $schema = new Schema(['query' => $factory->forQuery(GetUser::class), 'mutation' => $mutation]);
-        $result = GraphQL::executeQuery($schema, 'mutation {SetUser (id: 1, user: { name: "Lando" type: NormalUser }) { person { name, nameHashed }, type } }');
+        $result = GraphQL::executeQuery($schema, 'mutation {SetUser (id: 1, user: { name: "Lando" type: NormalUser, additionally: { alsoUserType: Admin } } ) { person { name, nameHashed }, type } }');
 
         $this->assertMatchesQuerySnapshot($result);
     }
