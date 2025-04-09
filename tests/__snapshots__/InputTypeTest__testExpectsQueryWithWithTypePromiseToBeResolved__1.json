@@ -1,0 +1,11 @@
+{
+    "data": {
+        "SetUser": {
+            "person": {
+                "name": "Lando",
+                "nameHashed": "55afd11eaeda11a6309cd3d93c69f62b1a0f4c489c6f0daa42daf6d28f1ded39"
+            },
+            "type": "NormalUser"
+        }
+    }
+}

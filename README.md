@@ -153,6 +153,37 @@ class GetUserByType extends \Filecage\GraphQL\Factory\Queries\Query {
 }
 ```
 
+#### Using other custom types inside the schema
+Additionally, you can use `TypePromise` to pass a promise that eventually resolves to a `Type` with access to the `Factory` to access
+schema entities during schema creation. This can also be used to access types like enums and is a more advanced alternative to `ArgumentType`
+
+```php
+class UserMutationInput implements \Filecage\GraphQL\Factory\Interfaces\TypePromise {
+    static function resolveType(\Filecage\GraphQL\Factory\Factory $factory) : \GraphQL\Type\Definition\Type{
+        return new \GraphQL\Type\Definition\InputObjectType([
+            'name' => 'UserMutationInput',
+            'fields' => [
+                'userType' => [
+                    'type' => $factory->forType(UserType::class)
+                ]            
+            ]
+        ]);
+    }
+}
+```
+
+and use it in `Argument`:
+
+```php
+new \Filecage\GraphQL\Factory\Queries\Argument(
+    name: 'user',
+    description: "The user mutation",
+    type: new UserMutationInput  
+)
+```
+
+Each returned type will be cached inside the factory instance with the class name as cache key.
+
 ### Resolving with dependencies
 It is most likely that when resolving a query, you would want to use a dependency like a database connection or an API client or whatever.
 To do so, a `Query` may return a `callable` instead of an object or `null`. This callable will then be passed to the previously defined

@@ -4,6 +4,7 @@ namespace Filecage\GraphQL\Factory\Factories;
 
 use Filecage\GraphQL\Factory\Exceptions\GraphQLFactoryException;
 use Filecage\GraphQL\Factory\Interfaces\Arguments\Resolvable;
+use Filecage\GraphQL\Factory\Interfaces\TypePromise;
 use Filecage\GraphQL\Factory\Queries\Argument;
 use Filecage\GraphQL\Factory\Queries\ArgumentType;
 use Generator;
@@ -100,9 +101,18 @@ final class QueryFactory implements TypeFactory {
     /**
      * @throws InvalidTypeException
      */
-    private function createArgumentType (Type|ArgumentType $argumentType) : Type {
+    private function createArgumentType (Type|TypePromise|ArgumentType $argumentType) : Type {
         if ($argumentType instanceof Type) {
             return $argumentType;
+        }
+
+        if ($argumentType instanceof TypePromise) {
+            $typePromiseClassName = get_class($argumentType);
+            if (!$this->cache->has($typePromiseClassName)) {
+                $this->cache->set($typePromiseClassName, $argumentType::resolveType($this->factory));
+            }
+
+            return $this->cache->get($typePromiseClassName);
         }
 
         $type = $this->factory->forType($argumentType->typeClassName);
