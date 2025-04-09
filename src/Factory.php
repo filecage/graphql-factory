@@ -31,7 +31,7 @@ final class Factory {
     function forQuery (string ...$queryClassNames) : Type {
         $queryReflections = array_map(fn(string $queryClassName) => $this->reflect($queryClassName), $queryClassNames);
 
-        return (new QueryFactory($this, $this->resolveFinalize, ...$queryReflections))->create();
+        return (new QueryFactory($this, $this->cache, $this->resolveFinalize, ...$queryReflections))->create();
     }
 
     /**

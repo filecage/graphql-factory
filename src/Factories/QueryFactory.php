@@ -29,7 +29,7 @@ final class QueryFactory implements TypeFactory {
     /**
      * @throws InvalidTypeException
      */
-    function __construct (private readonly Factory $factory, callable $resolveFinalize, ReflectionClass ...$queryReflections) {
+    function __construct (private readonly Factory $factory, private readonly Cache $cache, callable $resolveFinalize, ReflectionClass ...$queryReflections) {
         foreach ($queryReflections as $queryReflection) {
             if (!$queryReflection->isSubclassOf(Query::class)) {
                 throw new InvalidTypeException("Invalid query class `{$queryReflection->name}`: class must be of type " . Query::class);
