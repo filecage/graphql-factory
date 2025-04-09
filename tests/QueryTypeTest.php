@@ -20,7 +20,6 @@ class QueryTypeTest extends TestCase {
         $this->assertMatchesGraphQLSchemaSnapshot($schema);
     }
 
-
     function testExpectsQuerySchemaWithPublicGetterMethodToBeResolved () {
         $schema = new Schema(['query' => $this->provideFactory()->forQuery(GetUser::class)]);
         $result = GraphQL::executeQuery($schema, '{GetUser (id: 1) { person { name, nameHashed } } }');
