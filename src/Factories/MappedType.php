@@ -11,7 +11,7 @@ final class MappedType {
      */
     public readonly mixed $resolveFn;
 
-    function __construct (public readonly Type $type, callable $resolveFn = null) {
+    function __construct (public readonly Type $type, ?callable $resolveFn = null) {
         $this->resolveFn = $resolveFn;
     }
 
